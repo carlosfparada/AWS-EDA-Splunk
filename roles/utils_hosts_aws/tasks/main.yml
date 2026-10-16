@@ -1,0 +1,37 @@
+---
+
+- name: Get AAP node
+  set_fact:
+    node_name: "{{ item }}"
+  loop: "{{ groups['all'] }}"
+  when: hostvars[item].tags is defined and hostvars[item].tags.Name is match("^aap-1$")
+
+- name: Add AAP node to the aap group
+  add_host:
+    name: "{{ node_name }}"
+    groups: "aap"
+  when: node_name is defined
+
+- name: Get Cisco nodes
+  set_fact:
+    node_name: "{{ item }}"
+  loop: "{{ groups['all'] }}"
+  when: hostvars[item].tags is defined and hostvars[item].tags.Name is match("^cisco-1$")
+
+- name: Add Cisco node to the cisco group
+  add_host:
+    name: "{{ node_name }}"
+    groups: "cisco"
+  when: node_name is defined
+
+- name: Get Splunk node
+  set_fact:
+    node_name: "{{ item }}"
+  loop: "{{ groups['all'] }}"
+  when: hostvars[item].tags is defined and hostvars[item].tags.Name is match("^splunk-1$")
+
+- name: Add Splunk node to the splunk group
+  add_host:
+    name: "{{ node_name }}"
+    groups: "splunk"
+  when: node_name is defined
