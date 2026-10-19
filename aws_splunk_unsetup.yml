@@ -16,6 +16,10 @@
     - debug:
         var: inventory_hostname
 
+    - name: Disable boot-start
+      ansible.builtin.command: >
+        /opt/splunk/bin/splunk disable boot-start
+
     - name: Dettach Red Hat subscription
       community.general.redhat_subscription:
         state: absent

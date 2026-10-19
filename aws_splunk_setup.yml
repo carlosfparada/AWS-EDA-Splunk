@@ -35,10 +35,6 @@
         disable_gpg_check: true
         state: present
 
-    - name: Disable boot-start
-      ansible.builtin.command: >
-        /opt/splunk/bin/splunk disable boot-start
-
     - name: Seed admin credentials (first start only)
       ansible.builtin.copy:
         dest: /opt/splunk/etc/system/local/user-seed.conf
