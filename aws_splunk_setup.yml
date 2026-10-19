@@ -9,62 +9,73 @@
       name: utils_hosts_aws
 
 
-# - name: Setup RHEL Splunk
-#   hosts: splunk
-#   become: true
-#   tasks:
-#     - debug:
-#         var: inventory_hostname
+- name: Setup RHEL Splunk
+  hosts: splunk
+  become: true
+  tasks:
+    - debug:
+        var: inventory_hostname
 
-#     - name: Attach Red Hat subscription
-#       community.general.redhat_subscription:
-#         state: present
-#         username: "{{ subscription_user }}"
-#         password: "{{ subscription_pass }}"
-#         pool_ids: "{{ rh_subs_pool_id }}"
-#       become: true
+    # - name: Attach Red Hat subscription
+    #   community.general.redhat_subscription:
+    #     state: present
+    #     username: "{{ subscription_user }}"
+    #     password: "{{ subscription_pass }}"
+    #     pool_ids: "{{ rh_subs_pool_id }}"
+    #   become: true
 
-#     - name: Download Splunk RPM
-#       ansible.builtin.get_url:
-#         url: "https://download.splunk.com/products/splunk/releases/10.6.1.1/linux/splunk-10.6.1.1-b2ae2962645c.x86_64.rpm"
-#         dest: /tmp/splunk.rpm
+    - name: Download Splunk RPM
+      ansible.builtin.get_url:
+        url: "https://download.splunk.com/products/splunk/releases/10.6.1.1/linux/splunk-10.6.1.1-b2ae2962645c.x86_64.rpm"
+        dest: /tmp/splunk.rpm
         
-#     - name: Install Splunk RPM
-#       ansible.builtin.dnf:
-#         name: /tmp/splunk.rpm
-#         disable_gpg_check: true
-#         state: present
+    - name: Install Splunk RPM
+      ansible.builtin.dnf:
+        name: /tmp/splunk.rpm
+        disable_gpg_check: true
+        state: present
 
-#     - name: Seed admin credentials (first start only)
-#       ansible.builtin.copy:
-#         dest: /opt/splunk/etc/system/local/user-seed.conf
-#         content: |
-#           [user_info]
-#           USERNAME = admin
-#           PASSWORD = {{ ansible_password }}
-#         owner: splunk
-#         group: splunk
-#         mode: "0600"
-#         force: false
-#       no_log: true
+    - name: Seed admin credentials (first start only)
+      ansible.builtin.copy:
+        dest: /opt/splunk/etc/system/local/user-seed.conf
+        content: |
+          [user_info]
+          USERNAME = admin
+          PASSWORD = {{ ansible_password }}
+        owner: splunk
+        group: splunk
+        mode: "0600"
+        force: false
+      no_log: true
 
-#     - name: Disable boot-start
-#       ansible.builtin.command: >
-#         /opt/splunk/bin/splunk disable boot-start
+    - name: Disable boot-start
+      ansible.builtin.command: >
+        /opt/splunk/bin/splunk disable boot-start
 
-#     - name: Enable boot-start (accepts license)
-#       ansible.builtin.command: >
-#         /opt/splunk/bin/splunk enable boot-start
-#         -systemd-managed 1 -user splunk -group splunk
-#         --accept-license --answer-yes --no-prompt
-#       args:
-#         creates: /etc/systemd/system/Splunkd.service
+    - name: Enable boot-start (accepts license)
+      ansible.builtin.command: >
+        /opt/splunk/bin/splunk enable boot-start
+        -systemd-managed 1 -user splunk -group splunk
+        --accept-license --answer-yes --no-prompt
+      args:
+        creates: /etc/systemd/system/Splunkd.service
 
-#     - name: Start Splunk and enable at boot
-#       ansible.builtin.systemd:
-#         name: Splunkd
-#         state: started
-#         enabled: true
+    - name: Turn on SSL for Splunk Web
+      community.general.ini_file:
+        path: /opt/splunk/etc/system/local/web.conf
+        section: settings
+        option: enableSplunkWebSSL
+        value: "true"
+        owner: splunk
+        group: splunk
+        mode: "0600"
+      notify: Restart Splunk
+      
+    - name: Start Splunk and enable at boot
+      ansible.builtin.systemd:
+        name: Splunkd
+        state: started
+        enabled: true
 
 
 - name: Cisco setup
@@ -103,7 +114,6 @@
             - exit
             - exit
       no_log: false # hide passwords on logs
-
 
 
 - name: Configure Cisco logging to Splunk
