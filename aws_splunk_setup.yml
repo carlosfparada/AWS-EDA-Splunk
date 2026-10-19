@@ -35,6 +35,14 @@
         disable_gpg_check: true
         state: present
 
+    - name: Enable boot-start (accepts license)
+      ansible.builtin.command: >
+        /opt/splunk/bin/splunk enable boot-start
+        -systemd-managed 1 -user splunk -group splunk
+        --accept-license --answer-yes --no-prompt
+      args:
+        creates: /etc/systemd/system/Splunkd.service
+        
     - name: Start Splunk service
       ansible.builtin.service:
         name: splunk
