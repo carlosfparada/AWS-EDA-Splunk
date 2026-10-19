@@ -162,9 +162,9 @@
     state: running
   register: ec2_splunk_instance
 
-- name: Print RHEL instance details
+- name: Print RHEL Splunk instance details
   ansible.builtin.debug:
-    msg: "Instance RHEL Splunk DNS name is: {{ ec2_splunk_instance.instances[0].public_dns_name }} and IP address {{ ec2_splunk_instance.instances[0].public_ip_address }} and IP address (Private) {{ ec2_splunk_instance.instances[0].private_ip_address }}"
+    msg: "Instance RHEL Splunk DNS name is: {{ ec2_splunk_instance.instances[0].public_dns_name }}"
 
 
 - name: Wait until Cisco to boot up
