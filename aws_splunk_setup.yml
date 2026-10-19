@@ -14,14 +14,22 @@
   become: true
   tasks:
     - debug:
-        # var: hostvars[inventory_hostname].tags.Name
         var: inventory_hostname
 
-- name: Attach Red Hat subscription
-  community.general.redhat_subscription:
-    state: present
-    username: "{{ subscription_user }}"
-    password: "{{ subscription_pass }}"
-    pool_ids: "{{ rh_subs_pool_id }}"
-  become: true
+    - name: Attach Red Hat subscription
+      community.general.redhat_subscription:
+        state: present
+        username: "{{ subscription_user }}"
+        password: "{{ subscription_pass }}"
+        pool_ids: "{{ rh_subs_pool_id }}"
+      become: true
 
+    - name: Install Splunk
+      ansible.builtin.dnf:
+        name: splunk
+        state: present
+
+    - name: Start Splunk service
+      ansible.builtin.servce:
+        name: splunk
+        state: started
