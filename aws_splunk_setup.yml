@@ -57,7 +57,6 @@
         owner: splunk
         group: splunk
         mode: "0600"
-      notify: Restart Splunk
 
     # - name: Disable boot-start
     #   ansible.builtin.command: >
