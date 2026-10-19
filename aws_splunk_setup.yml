@@ -11,7 +11,7 @@
 
 - name: Setup RHEL Splunk
   hosts: splunk
-  become: true
+  #become: true
   tasks:
     - debug:
         var: inventory_hostname
@@ -76,13 +76,10 @@
         state: restarted
         enabled: true
 
-
-   ansible-playbook -i inventory.ini splunk_to_eda.yml
  
 - name: Send Cisco events from Splunk to Event-Driven Ansible
   hosts: splunk
-  become: true
- 
+  #become: true
   vars:
     eda_host: 10.0.0.200            # machine running ansible-rulebook
     eda_port: 5000
