@@ -39,15 +39,29 @@
       ansible.builtin.command: >
         /opt/splunk/bin/splunk disable boot-start
 
+    - name: Seed admin credentials (first start only)
+      ansible.builtin.copy:
+        dest: /opt/splunk/etc/system/local/user-seed.conf
+        content: |
+          [user_info]
+          USERNAME = admin
+          PASSWORD = {{ splunk_admin_password }}
+        owner: splunk
+        group: splunk
+        mode: "0600"
+        force: false
+      no_log: true
+
     - name: Enable boot-start (accepts license)
       ansible.builtin.command: >
         /opt/splunk/bin/splunk enable boot-start
         -systemd-managed 1 -user splunk -group splunk
         --accept-license --answer-yes --no-prompt
       args:
-        creates: /etc/systemd/system/splunkd.service
+        creates: /etc/systemd/system/Splunkd.service
 
-    - name: Start Splunk service
-      ansible.builtin.service:
-        name: splunkd
+    - name: Start Splunk and enable at boot
+      ansible.builtin.systemd:
+        name: Splunkd
+        state: started
         enabled: true
