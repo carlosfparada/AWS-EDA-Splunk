@@ -108,8 +108,10 @@
 
 - name: Configure Cisco logging to Splunk
   hosts: cisco
-  connection: ansible.netcommon.network_cli
   gather_facts: false
+  connection: ansible.netcommon.network_cli
+  vars:
+    ansible_network_os: cisco.ios.ios
   tasks:
     - name: Send syslog to Splunk
       cisco.ios.ios_config:
