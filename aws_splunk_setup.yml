@@ -35,6 +35,10 @@
         disable_gpg_check: true
         state: present
 
+    - name: Disable boot-start
+      ansible.builtin.command: >
+        /opt/splunk/bin/splunk disable boot-start
+
     - name: Enable boot-start (accepts license)
       ansible.builtin.command: >
         /opt/splunk/bin/splunk enable boot-start
