@@ -1,0 +1,27 @@
+---
+
+- name: Get nodes from Inventory and add to Groups
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+  - include_role: 
+      name: utils_hosts_aws
+
+
+- name: Setup RHEL Splunk with Lightspeed
+  hosts: splunk
+  become: true
+  tasks:
+    - debug:
+        # var: hostvars[inventory_hostname].tags.Name
+        var: inventory_hostname
+
+- name: Attach Red Hat subscription
+  community.general.redhat_subscription:
+    state: present
+    username: "{{ subscription_user }}"
+    password: "{{ subscription_pass }}"
+    pool_ids: "{{ rh_subs_pool_id }}"
+  become: true
+
