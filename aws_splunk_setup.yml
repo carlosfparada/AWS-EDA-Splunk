@@ -42,8 +42,8 @@
         --accept-license --answer-yes --no-prompt
       args:
         creates: /etc/systemd/system/Splunkd.service
-        
+
     - name: Start Splunk service
       ansible.builtin.service:
         name: splunk
-        state: started
+        enabled: true
