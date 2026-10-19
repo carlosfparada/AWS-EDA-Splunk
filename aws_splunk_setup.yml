@@ -77,6 +77,79 @@
         enabled: true
 
 
+   ansible-playbook -i inventory.ini splunk_to_eda.yml
+ 
+- name: Send Cisco events from Splunk to Event-Driven Ansible
+  hosts: splunk
+  become: true
+ 
+  vars:
+    eda_host: 10.0.0.200            # machine running ansible-rulebook
+    eda_port: 5000
+    cisco_host: 10.0.0.10           # Cisco device IP as Splunk sees it
+    match_text: "changed state to down"
+    alert_name: "Cisco - Send to EDA"
+    app_dir: /opt/splunk/etc/apps/network_alerts
+ 
+    alert_settings:
+      search: 'index=network sourcetype=cisco:ios host="{{ groups['cisco'][0] }}" "{{ match_text }}" | table _time, host, _raw'
+      enableSched: "1"
+      cron_schedule: "* * * * *"
+      dispatch.earliest_time: "-1m@m"
+      dispatch.latest_time: "@m"
+      counttype: "number of events"
+      relation: "greater than"
+      quantity: "0"
+      alert.digest_mode: "0"        # trigger once per result, not once per search
+      actions: webhook
+      action.webhook: "1"
+      action.webhook.param.url: "http://aap.cparada.com:11000"
+ 
+
+  tasks:
+    - name: Make sure the app directories exist
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: splunk
+        group: splunk
+        mode: "0755"
+      loop:
+        - "{{ app_dir }}"
+        - "{{ app_dir }}/local"
+ 
+    - name: Allow Splunk to send webhooks to EDA
+      community.general.ini_file:
+        path: /opt/splunk/etc/system/local/alert_actions.conf
+        section: webhook
+        option: allowlist.eda
+        value: "http://{{ eda_host }}:{{ eda_port }}/.*"
+        owner: splunk
+        group: splunk
+        mode: "0644"
+      notify: Restart Splunk
+ 
+    - name: Create the alert (filter + webhook to EDA)
+      community.general.ini_file:
+        path: "{{ app_dir }}/local/savedsearches.conf"
+        section: "{{ alert_name }}"
+        option: "{{ item.key }}"
+        value: "{{ item.value }}"
+        owner: splunk
+        group: splunk
+        mode: "0644"
+      loop: "{{ alert_settings | dict2items }}"
+      loop_control:
+        label: "{{ item.key }}"
+      notify: Restart Splunk
+ 
+  handlers:
+    - name: Restart Splunk
+      ansible.builtin.systemd:
+        name: Splunkd
+        state: restarted
+
+
 - name: Cisco setup
   hosts: localhost
   connection: local
@@ -132,3 +205,4 @@
           - "logging host {{ groups['cisco'][0] }} transport udp port 1514"
           - logging trap informational
         save_when: modified
+
