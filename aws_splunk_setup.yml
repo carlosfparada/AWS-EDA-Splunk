@@ -73,7 +73,7 @@
     - name: Start Splunk and enable at boot
       ansible.builtin.systemd:
         name: Splunkd
-        state: started
+        state: restarted
         enabled: true
 
 
