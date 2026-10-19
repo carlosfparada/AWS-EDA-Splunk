@@ -89,7 +89,7 @@
     app_dir: /opt/splunk/etc/apps/network_alerts
  
     alert_settings:
-      search: 'index=network sourcetype=cisco:ios host="{{ groups['cisco'][0] }} {{ match_text }}" | table _time, host, _raw'
+      search: "index=network sourcetype=cisco:ios host={{ groups['cisco'][0] }} {{ match_text }} | table _time, host, _raw"
       enableSched: "1"
       cron_schedule: "* * * * *"
       dispatch.earliest_time: "-1m@m"
