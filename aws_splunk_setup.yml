@@ -48,18 +48,6 @@
         force: false
       no_log: true
 
-    - name: Disable boot-start
-      ansible.builtin.command: >
-        /opt/splunk/bin/splunk disable boot-start
-
-    - name: Enable boot-start (accepts license)
-      ansible.builtin.command: >
-        /opt/splunk/bin/splunk enable boot-start
-        -systemd-managed 1 -user splunk -group splunk
-        --accept-license --answer-yes --no-prompt
-      args:
-        creates: /etc/systemd/system/Splunkd.service
-
     - name: Turn on SSL for Splunk Web
       community.general.ini_file:
         path: /opt/splunk/etc/system/local/web.conf
@@ -70,7 +58,19 @@
         group: splunk
         mode: "0600"
       notify: Restart Splunk
-      
+
+    # - name: Disable boot-start
+    #   ansible.builtin.command: >
+    #     /opt/splunk/bin/splunk disable boot-start
+
+    - name: Enable boot-start (accepts license)
+      ansible.builtin.command: >
+        /opt/splunk/bin/splunk enable boot-start
+        -systemd-managed 1 -user splunk -group splunk
+        --accept-license --answer-yes --no-prompt
+      args:
+        creates: /etc/systemd/system/Splunkd.service
+
     - name: Start Splunk and enable at boot
       ansible.builtin.systemd:
         name: Splunkd
