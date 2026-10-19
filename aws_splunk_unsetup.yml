@@ -9,19 +9,18 @@
       name: utils_hosts_aws
 
 
-- name: Setup RHEL Splunk with Lightspeed
+- name: Unsetup RHEL Splunk
   hosts: splunk
   become: true
   tasks:
     - debug:
-        # var: hostvars[inventory_hostname].tags.Name
         var: inventory_hostname
 
-- name: Attach Red Hat subscription
-  community.general.redhat_subscription:
-    state: present
-    username: "{{ subscription_user }}"
-    password: "{{ subscription_pass }}"
-    pool_ids: "{{ rh_subs_pool_id }}"
-  become: true
+    - name: Dettach Red Hat subscription
+      community.general.redhat_subscription:
+        state: absent
+        username: "{{ subscription_user }}"
+        password: "{{ subscription_pass }}"
+        pool_ids: "{{ rh_subs_pool_id }}"
+      become: true
 
