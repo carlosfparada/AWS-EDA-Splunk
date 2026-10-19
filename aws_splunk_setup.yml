@@ -9,59 +9,119 @@
       name: utils_hosts_aws
 
 
-- name: Setup RHEL Splunk with Lightspeed
-  hosts: splunk
+# - name: Setup RHEL Splunk
+#   hosts: splunk
+#   become: true
+#   tasks:
+#     - debug:
+#         var: inventory_hostname
+
+#     - name: Attach Red Hat subscription
+#       community.general.redhat_subscription:
+#         state: present
+#         username: "{{ subscription_user }}"
+#         password: "{{ subscription_pass }}"
+#         pool_ids: "{{ rh_subs_pool_id }}"
+#       become: true
+
+#     - name: Download Splunk RPM
+#       ansible.builtin.get_url:
+#         url: "https://download.splunk.com/products/splunk/releases/10.6.1.1/linux/splunk-10.6.1.1-b2ae2962645c.x86_64.rpm"
+#         dest: /tmp/splunk.rpm
+        
+#     - name: Install Splunk RPM
+#       ansible.builtin.dnf:
+#         name: /tmp/splunk.rpm
+#         disable_gpg_check: true
+#         state: present
+
+#     - name: Seed admin credentials (first start only)
+#       ansible.builtin.copy:
+#         dest: /opt/splunk/etc/system/local/user-seed.conf
+#         content: |
+#           [user_info]
+#           USERNAME = admin
+#           PASSWORD = {{ ansible_password }}
+#         owner: splunk
+#         group: splunk
+#         mode: "0600"
+#         force: false
+#       no_log: true
+
+#     - name: Disable boot-start
+#       ansible.builtin.command: >
+#         /opt/splunk/bin/splunk disable boot-start
+
+#     - name: Enable boot-start (accepts license)
+#       ansible.builtin.command: >
+#         /opt/splunk/bin/splunk enable boot-start
+#         -systemd-managed 1 -user splunk -group splunk
+#         --accept-license --answer-yes --no-prompt
+#       args:
+#         creates: /etc/systemd/system/Splunkd.service
+
+#     - name: Start Splunk and enable at boot
+#       ansible.builtin.systemd:
+#         name: Splunkd
+#         state: started
+#         enabled: true
+
+
+- name: Cisco setup
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+
+    # cat private-key.pem | ansible-vault encrypt_string  --stdin-name 'private_key' --output private-key.vault
+    - ansible.builtin.include_vars: files/private-key.yml
+
+    - name: Copy private key locally
+      ansible.builtin.copy:
+        content: "{{ private_key }}"
+        dest: /tmp/private-key.pem
+        mode: '0600'
+
+    - name: Set Cisco password
+      ansible.builtin.expect:
+        command: "ssh -o StrictHostKeyChecking=no -o PubkeyAcceptedKeyTypes=+ssh-rsa -o HostKeyAlgorithms=+ssh-rsa -i /tmp/private-key.pem ec2-user@{{ groups['cisco'][0] }}"
+        responses:
+          # ip-10-0-0-197# configure terminal
+          # ip-10-0-0-197(config)# aaa new-model
+          # ip-10-0-0-197(config)# aaa authentication login default local enable
+          # ip-10-0-0-197(config)# username ec2-user password xxxx
+          # ip-10-0-0-197(config)# exit
+          # ip-10-0-0-197# exit
+          'ip-*':
+            - configure terminal
+            - aaa new-model
+            - aaa authentication login default local enable
+            - username {{ ec2_cisco_user }} password {{ ec2_cisco_pass }}
+            - hostname Cisco-1
+          'Cisco-*':
+            - exit
+            - exit
+            - exit
+      no_log: false # hide passwords on logs
+
+
+- name: Config Cisco
+  hosts: cisco
   become: true
   tasks:
     - debug:
         var: inventory_hostname
 
-    - name: Attach Red Hat subscription
-      community.general.redhat_subscription:
-        state: present
-        username: "{{ subscription_user }}"
-        password: "{{ subscription_pass }}"
-        pool_ids: "{{ rh_subs_pool_id }}"
-      become: true
-
-    - name: Download Splunk RPM
-      ansible.builtin.get_url:
-        url: "https://download.splunk.com/products/splunk/releases/10.6.1.1/linux/splunk-10.6.1.1-b2ae2962645c.x86_64.rpm"
-        dest: /tmp/splunk.rpm
-        
-    - name: Install Splunk RPM
-      ansible.builtin.dnf:
-        name: /tmp/splunk.rpm
-        disable_gpg_check: true
-        state: present
-
-    - name: Seed admin credentials (first start only)
-      ansible.builtin.copy:
-        dest: /opt/splunk/etc/system/local/user-seed.conf
-        content: |
-          [user_info]
-          USERNAME = admin
-          PASSWORD = {{ ansible_password }}
-        owner: splunk
-        group: splunk
-        mode: "0600"
-        force: false
-      no_log: true
-
-    - name: Disable boot-start
-      ansible.builtin.command: >
-        /opt/splunk/bin/splunk disable boot-start
-
-    - name: Enable boot-start (accepts license)
-      ansible.builtin.command: >
-        /opt/splunk/bin/splunk enable boot-start
-        -systemd-managed 1 -user splunk -group splunk
-        --accept-license --answer-yes --no-prompt
-      args:
-        creates: /etc/systemd/system/Splunkd.service
-
-    - name: Start Splunk and enable at boot
-      ansible.builtin.systemd:
-        name: Splunkd
-        state: started
-        enabled: true
+    - name: Configure Cisco logging to Splunk
+      hosts: cisco
+      connection: ansible.netcommon.network_cli
+      gather_facts: false
+      tasks:
+        - name: Send syslog to Splunk
+          cisco.ios.ios_config:
+            lines:
+              - service timestamps log datetime msec localtime show-timezone
+              - logging source-interface Loopback0
+              - "logging host {{ groups['cisco'][0] }} transport udp port 1514"
+              - logging trap informational
+            save_when: modified
