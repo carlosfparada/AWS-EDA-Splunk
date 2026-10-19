@@ -21,7 +21,7 @@ ec2_cisco_eni_name2: ENI_CISCO_SPLUNK2
 ec2_igw_name: IGW_SPLUNK
 # Route Table
 ec2_rt_name: RT_SPLUNK
-# RHEL Rules
+# Splunk Rules
 ec2_sg_name: SG_SPLUNK
 ec2_sg_rules:
   - proto: tcp
