@@ -24,7 +24,6 @@
         pool_ids: "{{ rh_subs_pool_id }}"
       become: true
 
-
     - name: Download Splunk RPM
       ansible.builtin.get_url:
         url: "https://download.splunk.com/products/splunk/releases/10.6.1.1/linux/splunk-10.6.1.1-b2ae2962645c.x86_64.rpm"
@@ -33,6 +32,7 @@
     - name: Install Splunk RPM
       ansible.builtin.dnf:
         name: /tmp/splunk.rpm
+        disable_gpg_check: true
         state: present
 
     - name: Start Splunk service
