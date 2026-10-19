@@ -45,7 +45,7 @@
         content: |
           [user_info]
           USERNAME = admin
-          PASSWORD = {{ splunk_admin_password }}
+          PASSWORD = {{ splunk_password }}
         owner: splunk
         group: splunk
         mode: "0600"
