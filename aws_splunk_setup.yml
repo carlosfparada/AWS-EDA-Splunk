@@ -45,7 +45,7 @@
         content: |
           [user_info]
           USERNAME = admin
-          PASSWORD = {{ splunk_password }}
+          PASSWORD = {{ ansible_password }}
         owner: splunk
         group: splunk
         mode: "0600"
