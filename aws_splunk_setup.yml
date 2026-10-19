@@ -41,9 +41,9 @@
         -systemd-managed 1 -user splunk -group splunk
         --accept-license --answer-yes --no-prompt
       args:
-        creates: /etc/systemd/system/Splunkd.service
+        creates: /etc/systemd/system/splunkd.service
 
     - name: Start Splunk service
       ansible.builtin.service:
-        name: splunk
+        name: splunkd
         enabled: true
