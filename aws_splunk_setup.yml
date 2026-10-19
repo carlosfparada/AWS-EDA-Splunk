@@ -104,3 +104,18 @@
             - exit
       no_log: false # hide passwords on logs
 
+
+
+- name: Configure Cisco logging to Splunk
+  hosts: cisco
+  connection: ansible.netcommon.network_cli
+  gather_facts: false
+  tasks:
+    - name: Send syslog to Splunk
+      cisco.ios.ios_config:
+        lines:
+          - service timestamps log datetime msec localtime show-timezone
+          - logging source-interface Loopback0
+          - "logging host {{ groups['cisco'][0] }} transport udp port 1514"
+          - logging trap informational
+        save_when: modified
