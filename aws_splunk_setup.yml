@@ -107,6 +107,7 @@
 
 - name: Config Cisco
   hosts: cisco
+  gather_facts: no
   become: true
   tasks:
     - debug:
