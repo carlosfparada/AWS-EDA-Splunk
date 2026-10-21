@@ -96,7 +96,7 @@
       enableSched: "1"
       cron_schedule: "* * * * *"
       dispatch.earliest_time: "rt-1m"
-      dispatch.latest_time: "rt-1"
+      dispatch.latest_time: "rt"
       counttype: "number of events"
       relation: "greater than"
       quantity: "0"
