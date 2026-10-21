@@ -115,6 +115,20 @@
         - "{{ app_dir }}"
         - "{{ app_dir }}/local"
  
+    - name: Set Splunk Web to port 443 with SSL
+      community.general.ini_file:
+        path: /opt/splunk/etc/system/local/web.conf
+        section: settings
+        option: "{{ item.option }}"
+        value: "{{ item.value }}"
+        owner: splunk
+        group: splunk
+        mode: "0644"
+      loop:
+        - { option: httpport, value: "443" }
+        - { option: enableSplunkWebSSL, value: "true" }
+      notify: Restart Splunk
+
     - name: Allow Splunk to send webhooks to EDA
       community.general.ini_file:
         path: /opt/splunk/etc/system/local/alert_actions.conf
@@ -124,7 +138,6 @@
         owner: splunk
         group: splunk
         mode: "0644"
-      notify: Restart Splunk
  
     - name: Create the alert (filter + webhook to EDA)
       community.general.ini_file:
@@ -138,9 +151,7 @@
       loop: "{{ alert_settings | dict2items }}"
       loop_control:
         label: "{{ item.key }}"
-      notify: Restart Splunk
- 
-  handlers:
+
     - name: Restart Splunk
       ansible.builtin.systemd:
         name: Splunkd
