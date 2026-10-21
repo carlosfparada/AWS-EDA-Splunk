@@ -149,8 +149,6 @@
   connection: local
   gather_facts: no
   tasks:
-
-    # cat private-key.pem | ansible-vault encrypt_string  --stdin-name 'private_key' --output private-key.vault
     - ansible.builtin.include_vars: files/private-key.yml
 
     - name: Copy private key locally
@@ -196,7 +194,7 @@
         lines:
           - service timestamps log datetime msec localtime show-timezone
           - logging source-interface Loopback0
-          - "logging host {{ groups['cisco'][0] }} transport udp port 1514"
+          - "logging host {{ groups['splunk'][0] }} transport udp port 1514"
           - logging trap informational
         save_when: modified
 
