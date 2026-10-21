@@ -13,8 +13,8 @@
       actions:
         - print_event:
             pretty: true
-        # - run_job_template:
-        #     organization: "Default"
-        #     name: "AWS Splunk: Bla"
-        #     labels:
-        #       - EDA Cisco Splunk
+        - run_job_template:
+            organization: "Default"
+            name: "AWS Splunk: Restart Interface"
+            labels:
+              - EDA Cisco Splunk
