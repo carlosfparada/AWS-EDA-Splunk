@@ -92,11 +92,11 @@
     #app_dir: /opt/splunk/etc/apps/network_alerts
  
     alert_settings:
-      search: "index=network sourcetype=cisco:ios host={{ groups['cisco'][0] }} {{ match_text }} | table _time, host, _raw"
+      search: "index=network sourcetype=cisco:ios host={{ hostvars[groups['cisco'][0]].private_ip_address }} {{ match_text }} | table _time, host, _raw"
       enableSched: "1"
       cron_schedule: "* * * * *"
       dispatch.earliest_time: "rt-1m"
-      dispatch.latest_time: "rt"
+      dispatch.latest_time: "rt-1"
       counttype: "number of events"
       relation: "greater than"
       quantity: "0"
