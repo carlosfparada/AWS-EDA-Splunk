@@ -91,19 +91,35 @@
     #alert_name: "Cisco to EDA"
     #app_dir: /opt/splunk/etc/apps/network_alerts
  
+    # alert_settings:
+    #   search: "index=network sourcetype=cisco:ios _index_earliest=-2m _index_latest=now host={{ hostvars[groups['cisco'][0]].private_ip_address }} {{ match_text }} | table _time, host, _raw"
+    #   enableSched: "1"
+    #   cron_schedule: "* * * * *"
+    #   dispatch.earliest_time: "rt-1m"
+    #   dispatch.latest_time: "rt"
+    #   counttype: "number of events"
+    #   relation: "greater than"
+    #   quantity: "0"
+    #   alert.digest_mode: "0"        # trigger once per result, not once per search
+    #   actions: webhook
+    #   action.webhook: "1"
+    #   action.webhook.param.url: "http://{{ aap_fqdn }}:{{ aap_eda_port }}"
+
     alert_settings:
-      search: "index=network sourcetype=cisco:ios _index_earliest=-2m _index_latest=now host={{ hostvars[groups['cisco'][0]].private_ip_address }} {{ match_text }} | table _time, host, _raw"
-      enableSched: "1"
-      cron_schedule: "* * * * *"
+      search: "index=network sourcetype=cisco:ios host={{ hostvars[groups['cisco'][0]].private_ip_address }} {{ match_text }} | table _time, host, _raw"
+      # CHANGED: Disable cron schedule and explicitly enable real-time mode
+      enableSched: "0"
+      is_rt: "1"
       dispatch.earliest_time: "rt-1m"
       dispatch.latest_time: "rt"
       counttype: "number of events"
       relation: "greater than"
       quantity: "0"
-      alert.digest_mode: "0"        # trigger once per result, not once per search
+      alert.digest_mode: "0"
       actions: webhook
       action.webhook: "1"
       action.webhook.param.url: "http://{{ aap_fqdn }}:{{ aap_eda_port }}"
+
 
   tasks:
     - name: Make sure the app directories exist
