@@ -81,15 +81,15 @@
   hosts: splunk
   become: true
   vars:
-    eda_host: aap.cparada.com
-    eda_port: 11000
-    cisco_host: "{{ hostvars[groups['cisco'][0]].private_ip_address }}"
+    # eda_host: aap.cparada.com
+    # eda_port: 11000
+    #cisco_host: "{{ hostvars[groups['cisco'][0]].private_ip_address }}"
     # all logs
     #match_text: ""
     # Interface down logs
     match_text: "%LINEPROTO-5-UPDOWN"
-    alert_name: "Cisco - Send to EDA"
-    app_dir: /opt/splunk/etc/apps/network_alerts
+    alert_name: "Cisco to EDA"
+    #app_dir: /opt/splunk/etc/apps/network_alerts
  
     alert_settings:
       search: "index=network sourcetype=cisco:ios host={{ groups['cisco'][0] }} {{ match_text }} | table _time, host, _raw"
@@ -103,7 +103,7 @@
       alert.digest_mode: "0"        # trigger once per result, not once per search
       actions: webhook
       action.webhook: "1"
-      action.webhook.param.url: "http://aap.cparada.com:11000"
+      action.webhook.param.url: "http://{{ aap_fqdn }}:{{ aap_eda_port }}"
  
 
   tasks:
@@ -115,22 +115,22 @@
         group: splunk
         mode: "0755"
       loop:
-        - "{{ app_dir }}"
-        - "{{ app_dir }}/local"
+        - "/opt/splunk/etc/apps/network_alerts"
+        - "/opt/splunk/etc/apps/network_alerts/local"
  
     - name: Allow Splunk to send webhooks to EDA
       community.general.ini_file:
         path: /opt/splunk/etc/system/local/alert_actions.conf
         section: webhook
         option: allowlist.eda
-        value: "http://{{ eda_host }}:{{ eda_port }}/.*"
+        value: "http://{{ aap_fqdn }}:{{ aap_eda_port }}/.*"
         owner: splunk
         group: splunk
         mode: "0644"
  
     - name: Create the alert (filter + webhook to EDA)
       community.general.ini_file:
-        path: "{{ app_dir }}/local/savedsearches.conf"
+        path: "/opt/splunk/etc/apps/network_alerts/local/savedsearches.conf"
         section: "{{ alert_name }}"
         option: "{{ item.key }}"
         value: "{{ item.value }}"
