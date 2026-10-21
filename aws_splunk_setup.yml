@@ -87,8 +87,8 @@
     # all logs
     #match_text: ""
     # Interface down logs
-    match_text: "%LINEPROTO-5-UPDOWN"
-    alert_name: "Cisco to EDA"
+    #match_text: "%LINEPROTO-5-UPDOWN"
+    #alert_name: "Cisco to EDA"
     #app_dir: /opt/splunk/etc/apps/network_alerts
  
     alert_settings:
