@@ -228,7 +228,7 @@
       cisco.ios.ios_config:
         lines:
           - service timestamps log datetime msec localtime show-timezone
-          - logging source-interface Loopback0
+          - logging source-interface GigabitEthernet 1
           - "logging host {{ groups['splunk'][0] }} transport udp port 1514"
           - logging trap informational
         save_when: modified

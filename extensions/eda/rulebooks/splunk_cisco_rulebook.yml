@@ -1,86 +1,20 @@
 ---
 
 # example_rulebook.yaml
-- name: Red Hat Insights (Lightspeed)
+- name: Cisco Splunk rulebook
   hosts: localhost
   sources:
-    # console.redhat.com -> Settings -> Integrations -> Reporting & automation -> Event-Driven Ansible
-    - redhatinsights.eda.insights:
+    - ansible.eda.webhook:
         host: 0.0.0.0
         port: 11000
   rules:
-    - name: Match any new known exploit vulnerability events
-    # Activate notifications for EDA
-    # https://console.redhat.com/settings/notifications/configure-events?bundle=rhel&tab=configuration
-    # Global-level
-      # "new-recommendation",
-      # "any-cve-known-exploit",
-      # "new-cve-cvss",
-      # "new-cve-severity",
-      # "new-cve-security-rule"
-      condition: |-
-        event.payload.application == "vulnerability"
-        and event.payload.event_type in [
-          "any-cve-known-exploit"
-        ]
+    - name: Match Cisco log event
+      condition: event.payload is defined
       actions:
         - print_event:
             pretty: true
-        - run_workflow_template:
-            organization: "Default"
-            name: "AWS AIOps: MITIGATION & REMEDIATION Workflow"
-            labels:
-              - EDA Lightspeed Vulnerability All
-
-    - name: Match all System known exploit vulnerability events
-    # Activate notifications for EDA
-    # https://console.redhat.com/settings/notifications/configure-events?bundle=rhel&tab=configuration
-    # System-level
-      # system-cve-known-exploit
-      # system-cve-severity
-      # system-cve-security-rule
-      # system-cve-cvss
-      # system-cve-all
-      condition: |-
-        event.payload.application == "vulnerability"
-        and event.payload.event_type in [
-          "system-cve-known-exploit"
-        ]
-      actions:
-        - print_event:
-            pretty: true
-        - run_job_template:
-            organization: "Default"
-            name: "AWS AIOps: Check CVE Systems"
-            labels:
-              - EDA Lightspeed Vulnerability System
-
-
-
-    # - name: Match Advisor Recommendation Event
-    #   condition:
-    #     event.payload.application == "advisor"
-    #     and event.payload.event_type == "new-recommendation"
-    #     # event.payload.application == "malware-detection"
-    #     # and event.payload.event_type == "detected-malware"
-    #   actions:
-    #     - print_event:
-    #         pretty: true
-    #     - run_job_template:
-    #         organization: "Default"
-    #         name: "AWS AIOps: X. Action"
-    #         labels:
-    #           - EDA Lightspeed Advisor
-
-    # - name: Match Compliance Below Threshold
-    #   condition:
-    #     event.payload.application == "compliance"
-    #     and event.payload.event_type == "compliance-below-threshold"
-    #   actions:
-    #     - print_event:
-    #         pretty: true
-    #     # - run_job_template:
-    #     #     organization: "Default"
-    #     #     name: "AIOps: XXX"
-    #     # labels:
-    #     #   - EDA Lightspeed
+        # - run_job_template:
+        #     organization: "Default"
+        #     name: "AWS Splunk: Bla"
+        #     labels:
+        #       - EDA Cisco Splunk
