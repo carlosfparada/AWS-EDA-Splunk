@@ -127,7 +127,6 @@
       loop:
         - { option: httpport, value: "443" }
         - { option: enableSplunkWebSSL, value: "true" }
-      notify: Restart Splunk
 
     - name: Allow Splunk to send webhooks to EDA
       community.general.ini_file:
