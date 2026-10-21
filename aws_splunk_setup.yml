@@ -84,7 +84,7 @@
     eda_host: 10.0.0.200            # machine running ansible-rulebook
     eda_port: 5000
     cisco_host: 10.0.0.10           # Cisco device IP as Splunk sees it
-    match_text: "changed state to down"
+    match_text: "%SYS-5-CONFIG_I: Configured from console by ec2-user"
     alert_name: "Cisco - Send to EDA"
     app_dir: /opt/splunk/etc/apps/network_alerts
  
@@ -92,8 +92,8 @@
       search: "index=network sourcetype=cisco:ios host={{ groups['cisco'][0] }} {{ match_text }} | table _time, host, _raw"
       enableSched: "1"
       cron_schedule: "* * * * *"
-      dispatch.earliest_time: "-1m@m"
-      dispatch.latest_time: "@m"
+      dispatch.earliest_time: "-2m"
+      dispatch.latest_time: "now"
       counttype: "number of events"
       relation: "greater than"
       quantity: "0"
