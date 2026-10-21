@@ -164,7 +164,7 @@
 
 - name: Print RHEL Splunk instance details
   ansible.builtin.debug:
-    msg: "RHEL Splunk DNS access is: http://{{ ec2_splunk_instance.instances[0].public_dns_name }}:8000"
+    msg: "RHEL Splunk DNS access is: https://{{ ec2_splunk_instance.instances[0].public_dns_name }}:8000"
 
 
 - name: Wait until Cisco to boot up
