@@ -175,7 +175,6 @@
           homePath = $SPLUNK_DB/{{ index_name }}/db
           coldPath = $SPLUNK_DB/{{ index_name }}/colddb
           thawedPath = $SPLUNK_DB/{{ index_name }}/thaweddb
-      notify: Restart Splunk
 
     - name: Create the UDP syslog input
       ansible.builtin.copy:
@@ -188,14 +187,7 @@
           sourcetype = cisco:ios
           index = {{ index_name }}
           connection_host = ip
-      notify: Restart Splunk
 
-  handlers:
-    - name: Restart Splunk
-      ansible.builtin.systemd:
-        name: Splunkd
-        state: restarted
-        
 
 - name: Cisco setup
   hosts: localhost
