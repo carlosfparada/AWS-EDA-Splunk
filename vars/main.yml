@@ -29,6 +29,8 @@ ec2_sg_rules:
       - 80
       - 443
       - 22
+      - 8000 # Splunk UI
+      - 1514 # 1514
     cidr_ip: 0.0.0.0/0
     rule_desc: Allow all on ports
   - proto: icmp
