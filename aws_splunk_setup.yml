@@ -81,10 +81,13 @@
   hosts: splunk
   become: true
   vars:
-    eda_host: 10.0.0.200            # machine running ansible-rulebook
-    eda_port: 5000
-    cisco_host: 10.0.0.10           # Cisco device IP as Splunk sees it
-    match_text: "%SYS-5-CONFIG_I: Configured from console by ec2-user"
+    eda_host: aap.cparada.com
+    eda_port: 11000
+    cisco_host: "{{ hostvars[groups['cisco'][0]].private_ip_address }}"
+    # all logs
+    #match_text: ""
+    # Interface down logs
+    match_text: "%LINEPROTO-5-UPDOWN"
     alert_name: "Cisco - Send to EDA"
     app_dir: /opt/splunk/etc/apps/network_alerts
  
