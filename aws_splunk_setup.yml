@@ -138,21 +138,6 @@
       loop_control:
         label: "{{ item.key }}"
 
-    - name: Restart Splunk
-      ansible.builtin.systemd:
-        name: Splunkd
-        state: restarted
-
-- name: Create the Splunk index and syslog input
-  hosts: splunk
-  become: true
-
-  vars:
-    app_dir: /opt/splunk/etc/apps/network_alerts
-    index_name: network
-    syslog_port: 1514
-
-  tasks:
     - name: Make sure the app directories exist
       ansible.builtin.file:
         path: "{{ item }}"
@@ -161,32 +146,37 @@
         group: splunk
         mode: "0755"
       loop:
-        - "{{ app_dir }}"
-        - "{{ app_dir }}/local"
+        - "/opt/splunk/etc/apps/network_alerts"
+        - "/opt/splunk/etc/apps/network_alerts/local"
 
     - name: Create the index
       ansible.builtin.copy:
-        dest: "{{ app_dir }}/local/indexes.conf"
+        dest: "/opt/splunk/etc/apps/network_alerts/local/indexes.conf"
         owner: splunk
         group: splunk
         mode: "0644"
         content: |
-          [{{ index_name }}]
-          homePath = $SPLUNK_DB/{{ index_name }}/db
-          coldPath = $SPLUNK_DB/{{ index_name }}/colddb
-          thawedPath = $SPLUNK_DB/{{ index_name }}/thaweddb
+          [network]
+          homePath = $SPLUNK_DB/network/db
+          coldPath = $SPLUNK_DB/network/colddb
+          thawedPath = $SPLUNK_DB/network/thaweddb
 
     - name: Create the UDP syslog input
       ansible.builtin.copy:
-        dest: "{{ app_dir }}/local/inputs.conf"
+        dest: "/opt/splunk/etc/apps/network_alerts/local/inputs.conf"
         owner: splunk
         group: splunk
         mode: "0644"
         content: |
-          [udp://{{ syslog_port }}]
+          [udp://1514]
           sourcetype = cisco:ios
-          index = {{ index_name }}
+          index = network
           connection_host = ip
+
+    - name: Restart Splunk
+      ansible.builtin.systemd:
+        name: Splunkd
+        state: restarted
 
 
 - name: Cisco setup
