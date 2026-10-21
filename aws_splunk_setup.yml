@@ -104,7 +104,6 @@
       actions: webhook
       action.webhook: "1"
       action.webhook.param.url: "http://{{ aap_fqdn }}:{{ aap_eda_port }}"
- 
 
   tasks:
     - name: Make sure the app directories exist
