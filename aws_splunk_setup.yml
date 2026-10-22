@@ -120,35 +120,22 @@
 
     - name: Create the alert in savedsearches.conf
       vars:
-        # alert_settings:
-        #   search: "index=network sourcetype=cisco:ios _index_earliest=-2m _index_latest=now host={{ hostvars[groups['cisco'][0]].private_ip_address }} {{ match_text }} | table _time, host, _raw"
-        #   enableSched: "1"
-        #   cron_schedule: "* * * * *"
-        #   dispatch.earliest_time: "rt-1m"
-        #   dispatch.latest_time: "rt"
-        #   counttype: "number of events"
-        #   relation: "greater than"
-        #   quantity: "0"
-        #   alert.digest_mode: "0"        # trigger once per result, not once per search
-        #   actions: webhook
-        #   action.webhook: "1"
-        #   action.webhook.param.url: "http://{{ aap_fqdn }}:{{ aap_eda_port }}"
         alert_settings:
-          # 1. SPL Query (Remove _index_earliest so real-time memory streaming works)
+          # SPL Query (Remove _index_earliest so real-time memory streaming works)
           search: "index=network sourcetype=cisco:ios host={{ hostvars[groups['cisco'][0]].private_ip_address }} {{ match_text }} | table _time, host, _raw"
-          # 2. Real-Time Mode Configuration
+          # Real-Time Mode Configuration
           enableSched: "0"                   # Disable periodic cron runs
           is_rt: "1"                         # Tell Splunk this is a continuous real-time search
           is_scheduled: "1"                  # Forces Splunk to register this as an Alert, NOT a Report
           dispatch.earliest_time: "rt-1m"    # Continuous 1-minute lookback window
           dispatch.latest_time: "rt"         # Real-time streaming edge          
-          # 3. Trigger Conditions
+          # Trigger Conditions
           counttype: "number of events"
           relation: "greater than"
           quantity: "0"
           alert.digest_mode: "0"             # Send 1 separate webhook POST per event immediately
           alert.suppress: "0"
-          # 4. Webhook Action
+          # Webhook Action
           actions: "webhook"
           action.webhook: "1"
           action.webhook.param.url: "http://{{ aap_fqdn }}:{{ aap_eda_port }}"
