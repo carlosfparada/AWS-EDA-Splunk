@@ -124,57 +124,57 @@
         owner: splunk
         group: splunk
         mode: "0644"
-        content: |
-          [cisco:ios]
-          SHOULD_LINEMERGE = false
-          LINE_BREAKER = ([\r\n]+)
         # content: |
         #   [cisco:ios]
         #   SHOULD_LINEMERGE = false
         #   LINE_BREAKER = ([\r\n]+)
-        #   DATETIME_CONFIG = NONE
-        #   MAX_TIMESTAMP_LOOKAHEAD = 0
+        content: |
+          [cisco:ios]
+          SHOULD_LINEMERGE = false
+          LINE_BREAKER = ([\r\n]+)
+          DATETIME_CONFIG = NONE
+          MAX_TIMESTAMP_LOOKAHEAD = 0
             
     - name: Create the alert in savedsearches.conf
       vars:
-        alert_settings:
-          # Utiliza _index_earliest=-2m para ignorar a hora do router e avaliar apenas a hora de chegada no servidor
-          search: "index=network _index_earliest=-2m _index_latest=now sourcetype=cisco:ios host=10.0.0.220 %LINK-5-CHANGED | table _time, host, _raw"
-          
-          enableSched: "1"                    # Ativa o agendamento
-          is_scheduled: "1"                   # Força o Splunk a registar como Alerta
-          cron_schedule: "* * * * *"          # Executa a cada minuto
-          dispatch.earliest_time: "-2m"
-          dispatch.latest_time: "now"
-          
-          counttype: "number of events"
-          relation: "greater than"
-          quantity: "0"
-          alert.digest_mode: "0"              # Dispara 1 webhook individual por cada linha de log
-          alert.suppress: "0"
-          
-          actions: "webhook"
-          action.webhook: "1"
-          action.webhook.param.url: "http://{{ aap_fqdn }}:{{ aap_eda_port }}"
         # alert_settings:
-        #   # SPL Query (Remove _index_earliest so real-time memory streaming works)
-        #   search: "index=network sourcetype=cisco:ios host={{ hostvars[groups['cisco'][0]].private_ip_address }} {{ match_text }} | table _time, host, _raw"
-        #   # Real-Time Mode Configuration
-        #   enableSched: "0"                   # Disable periodic cron runs
-        #   is_rt: "1"                         # Tell Splunk this is a continuous real-time search
-        #   is_scheduled: "1"                  # Forces Splunk to register this as an Alert, NOT a Report
-        #   dispatch.earliest_time: "rt-1m"    # Continuous 1-minute lookback window
-        #   dispatch.latest_time: "rt"         # Real-time streaming edge          
-        #   # Trigger Conditions
+        #   # Utiliza _index_earliest=-2m para ignorar a hora do router e avaliar apenas a hora de chegada no servidor
+        #   search: "index=network _index_earliest=-2m _index_latest=now sourcetype=cisco:ios host=10.0.0.220 %LINK-5-CHANGED | table _time, host, _raw"
+          
+        #   enableSched: "1"                    # Ativa o agendamento
+        #   is_scheduled: "1"                   # Força o Splunk a registar como Alerta
+        #   cron_schedule: "* * * * *"          # Executa a cada minuto
+        #   dispatch.earliest_time: "-2m"
+        #   dispatch.latest_time: "now"
+          
         #   counttype: "number of events"
         #   relation: "greater than"
         #   quantity: "0"
-        #   alert.digest_mode: "0"             # Send 1 separate webhook POST per event immediately
+        #   alert.digest_mode: "0"              # Dispara 1 webhook individual por cada linha de log
         #   alert.suppress: "0"
-        #   # Webhook Action
+          
         #   actions: "webhook"
         #   action.webhook: "1"
         #   action.webhook.param.url: "http://{{ aap_fqdn }}:{{ aap_eda_port }}"
+        alert_settings:
+          # SPL Query (Remove _index_earliest so real-time memory streaming works)
+          search: "index=network sourcetype=cisco:ios host={{ hostvars[groups['cisco'][0]].private_ip_address }} {{ match_text }} | table _time, host, _raw"
+          # Real-Time Mode Configuration
+          enableSched: "0"                   # Disable periodic cron runs
+          is_rt: "1"                         # Tell Splunk this is a continuous real-time search
+          is_scheduled: "1"                  # Forces Splunk to register this as an Alert, NOT a Report
+          dispatch.earliest_time: "rt-1m"    # Continuous 1-minute lookback window
+          dispatch.latest_time: "rt"         # Real-time streaming edge          
+          # Trigger Conditions
+          counttype: "number of events"
+          relation: "greater than"
+          quantity: "0"
+          alert.digest_mode: "0"             # Send 1 separate webhook POST per event immediately
+          alert.suppress: "0"
+          # Webhook Action
+          actions: "webhook"
+          action.webhook: "1"
+          action.webhook.param.url: "http://{{ aap_fqdn }}:{{ aap_eda_port }}"
       community.general.ini_file:
         path: "/opt/splunk/etc/apps/network_alerts/local/savedsearches.conf"
         section: "{{ alert_name }}"
