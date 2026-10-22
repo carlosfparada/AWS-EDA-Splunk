@@ -161,7 +161,6 @@
           #cron_schedule: "* * * * *"          # Executa a cada minuto
           dispatch.earliest_time: "rt-70m"
           dispatch.latest_time: "rt"
-          alert.digest_mode: 0
           # Trigger Conditions
           counttype: "number of events"
           relation: "greater than"
@@ -203,6 +202,17 @@
       loop_control:
         label: "{{ item.key }}"
 
+    - name: Set UI visibility and permissions for savedsearches
+        ansible.builtin.copy:
+          dest: "/opt/splunk/etc/apps/network_alerts/metadata/local.meta"
+          owner: splunk
+          group: splunk
+          mode: "0644"
+          content: |
+            [savedsearches/{{ alert_name }}]
+            access = : [ * ], write : [ admin ]
+            export = system
+            
     - name: Create the index
       ansible.builtin.copy:
         dest: "/opt/splunk/etc/apps/network_alerts/local/indexes.conf"
