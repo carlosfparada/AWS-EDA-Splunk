@@ -12,6 +12,7 @@
 - name: Restart Cisco Interface
   hosts: cisco
   become: true
+  gather_facts: no
   tasks:
     - debug:
         var: inventory_hostname
