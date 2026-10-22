@@ -150,10 +150,10 @@
           dispatch.latest_time: "now"
           # Trigger Conditions
           alert_type: "number of events"
-          alert.track: "1"
           counttype: "number of events"
           relation: "greater than"
           quantity: "0"
+          alert.track: "1"
           alert.digest_mode: "0"              # Dispara 1 webhook individual por cada linha de log
           alert.suppress: "0"
           # Webhook Action
