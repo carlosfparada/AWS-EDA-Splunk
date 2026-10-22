@@ -194,7 +194,7 @@
           # 1. Establish app-level sharing rules
           []
           access = read : [ * ], write : [ admin ]
-          export = system
+          export = none
 
           # 2. Expose the specific real-time alert object
           [savedsearches/{{ alert_name | replace(' ', '%20') }}]
