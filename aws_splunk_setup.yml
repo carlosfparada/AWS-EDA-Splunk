@@ -202,6 +202,18 @@
       loop_control:
         label: "{{ item.key }}"
 
+    - name: Make sure the app directories exist
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: splunk
+        group: splunk
+        mode: "0755"
+      loop:
+        - "/opt/splunk/etc/apps/network_alerts"
+        - "/opt/splunk/etc/apps/network_alerts/local"
+        - "/opt/splunk/etc/apps/network_alerts/metadata"
+    
     - name: Set UI visibility and permissions for savedsearches
       ansible.builtin.copy:
         dest: "/opt/splunk/etc/apps/network_alerts/metadata/local.meta"
