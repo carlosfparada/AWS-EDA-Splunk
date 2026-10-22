@@ -200,6 +200,7 @@
           [savedsearches/{{ alert_name | replace(' ', '%20') }}]
           access = read : [ * ], write : [ admin ]
           export = system
+          owner = admin
             
     - name: Create the index
       ansible.builtin.copy:
