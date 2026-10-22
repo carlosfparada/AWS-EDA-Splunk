@@ -156,8 +156,8 @@
           #   dispatch.earliest_time: "rt-1m"    # Continuous 1-minute lookback window
           #   dispatch.latest_time: "rt"         # Real-time streaming edge     
           enableSched: "1"                    # Ativa o agendamento
-          is_scheduled: "0"                   # Força o Splunk a registar como Alerta
-          realtime_schedule: 1
+          is_scheduled: "1"                   # Força o Splunk a registar como Alerta
+          realtime_schedule: "1"
           #cron_schedule: "* * * * *"          # Executa a cada minuto
           dispatch.earliest_time: "rt-70m"
           dispatch.latest_time: "rt"
