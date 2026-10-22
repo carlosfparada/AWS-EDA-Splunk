@@ -151,8 +151,8 @@
           dispatch.earliest_time: "-2m"
           dispatch.latest_time: "now"
 
-          is_rt: "1"
-          realtime_schedule: "1"
+          # is_rt: "1"
+          # realtime_schedule: "1"
 
 
           # Real-Time Cron Mode Configuration
