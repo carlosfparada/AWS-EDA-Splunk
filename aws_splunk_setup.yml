@@ -139,7 +139,7 @@
       vars:
         alert_settings:
           # Use _index_earliest=-2m the router timestamp and only consider splunk arrival time
-          search: "index=network _index_earliest=-2m _index_latest=now sourcetype=cisco:ios host={{ hostvars[groups['cisco'][0]].private_ip_address }} {{ match_text }} | table _time, host, _raw"
+          search: "index=network sourcetype=cisco:ios host={{ hostvars[groups['cisco'][0]].private_ip_address }} {{ match_text }} | table _time, host, _raw"
 
           # Working
           # search: "index=network _index_earliest=-2m _index_latest=now sourcetype=cisco:ios host={{ hostvars[groups['cisco'][0]].private_ip_address }} {{ match_text }} | table _time, host, _raw"
@@ -159,7 +159,7 @@
           is_scheduled: "0"                   # Força o Splunk a registar como Alerta
           realtime_schedule: 1
           #cron_schedule: "* * * * *"          # Executa a cada minuto
-          dispatch.earliest_time: "rt-5m"
+          dispatch.earliest_time: "rt-70m"
           dispatch.latest_time: "rt"
           alert.digest_mode: 0
           # Trigger Conditions
