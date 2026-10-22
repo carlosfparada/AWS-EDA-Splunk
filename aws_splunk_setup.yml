@@ -138,7 +138,7 @@
     - name: Create the alert in savedsearches.conf
       vars:
         alert_settings:
-          # Utiliza _index_earliest=-2m para ignorar a hora do router e avaliar apenas a hora de chegada no servidor
+          # Use _index_earliest=-2m the router timestamp and only consider splunk arrival time
           search: "index=network _index_earliest=-2m _index_latest=now sourcetype=cisco:ios host={{ hostvars[groups['cisco'][0]].private_ip_address }} {{ match_text }} | table _time, host, _raw"
           
           enableSched: "1"                    # Ativa o agendamento
