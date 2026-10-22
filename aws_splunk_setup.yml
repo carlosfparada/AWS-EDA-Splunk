@@ -140,19 +140,24 @@
         alert_settings:
           # Use _index_earliest=-2m the router timestamp and only consider splunk arrival time
           search: "index=network _index_earliest=-2m _index_latest=now sourcetype=cisco:ios host={{ hostvars[groups['cisco'][0]].private_ip_address }} {{ match_text }} | table _time, host, _raw"
-          
+          # Real-Time Cron Mode Configuration
+          #   enableSched: "0"                   # Disable periodic cron runs
+          #   is_rt: "1"                         # Tell Splunk this is a continuous real-time search
+          #   is_scheduled: "1"                  # Forces Splunk to register this as an Alert, NOT a Report
+          #   dispatch.earliest_time: "rt-1m"    # Continuous 1-minute lookback window
+          #   dispatch.latest_time: "rt"         # Real-time streaming edge     
           enableSched: "1"                    # Ativa o agendamento
           is_scheduled: "1"                   # Força o Splunk a registar como Alerta
           cron_schedule: "* * * * *"          # Executa a cada minuto
           dispatch.earliest_time: "-2m"
           dispatch.latest_time: "now"
-          
+          # Trigger Conditions
           counttype: "number of events"
           relation: "greater than"
           quantity: "0"
           alert.digest_mode: "0"              # Dispara 1 webhook individual por cada linha de log
           alert.suppress: "0"
-          
+          # Webhook Action
           actions: "webhook"
           action.webhook: "1"
           action.webhook.param.url: "http://{{ aap_fqdn }}:{{ aap_eda_port }}"
