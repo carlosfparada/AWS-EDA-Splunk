@@ -118,6 +118,16 @@
         group: splunk
         mode: "0644"
 
+    - name: Create props.conf to force current server time on incoming logs
+      ansible.builtin.copy:
+        dest: "/opt/splunk/etc/apps/network_alerts/local/props.conf"
+        owner: splunk
+        group: splunk
+        mode: "0644"
+        content: |
+          [cisco:ios]
+          DATETIME_CONFIG = NONE
+            
     - name: Create the alert in savedsearches.conf
       vars:
         alert_settings:
