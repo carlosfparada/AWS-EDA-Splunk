@@ -15,7 +15,7 @@
             pretty: true
         - run_job_template:
             organization: "Default"
-            #name: "AWS EDA Splunk: AO Forwarder"
+            #name: "AWS Splunk: AO Forwarder"
             name: "AWS Splunk: Restart Interface"
             labels:
               - EDA Cisco Splunk
