@@ -199,7 +199,7 @@
           # 2. Expose the specific real-time alert object
           [savedsearches/{{ alert_name | replace(' ', '%20') }}]
           access = read : [ * ], write : [ admin ]
-          export = system
+          export = app
           owner = admin
             
     - name: Create the index
