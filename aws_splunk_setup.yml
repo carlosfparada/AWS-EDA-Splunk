@@ -157,10 +157,11 @@
           #   dispatch.latest_time: "rt"         # Real-time streaming edge     
           enableSched: "1"                    # Ativa o agendamento
           is_scheduled: "0"                   # Força o Splunk a registar como Alerta
-          #realtime_schedule: 1
+          realtime_schedule: 1
           #cron_schedule: "* * * * *"          # Executa a cada minuto
-          dispatch.earliest_time: "rt-5"
+          dispatch.earliest_time: "rt-5m"
           dispatch.latest_time: "rt"
+          alert.digest_mode: 0
           # Trigger Conditions
           counttype: "number of events"
           relation: "greater than"
