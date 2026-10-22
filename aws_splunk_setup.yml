@@ -136,6 +136,8 @@
           MAX_TIMESTAMP_LOOKAHEAD = 0
             
     - name: Create the alert in savedsearches.conf
+      # search for alerts 
+      #index=_internal sourcetype=splunkd component=sendmodalert | table _time, savedsearch_name, status, action_name, _raw
       vars:
         alert_settings:
           # Use _index_earliest=-2m the router timestamp and only consider splunk arrival time
@@ -144,8 +146,8 @@
           # Working
           # search: "index=network _index_earliest=-2m _index_latest=now sourcetype=cisco:ios host={{ hostvars[groups['cisco'][0]].private_ip_address }} {{ match_text }} | table _time, host, _raw"
           enableSched: "1"                    # Ativa o agendamento
-          is_scheduled: "1"                   # Força o Splunk a registar como Alerta
-          cron_schedule: "* * * * *"          # Executa a cada minuto
+          is_scheduled: "1"                   # Forces Splunk to register as Alert
+          cron_schedule: "* * * * *"          # Executes every minute
           dispatch.earliest_time: "-2m"
           dispatch.latest_time: "now"
 
