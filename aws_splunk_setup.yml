@@ -154,24 +154,6 @@
 
           dispatch.earliest_time: "rt"
           dispatch.latest_time: "rt"
-
-
-
-          # Real-Time Cron Mode Configuration
-          #   enableSched: "0"                   # Disable periodic cron runs
-          #   is_rt: "1"                         # Tell Splunk this is a continuous real-time search
-          #   is_scheduled: "1"                  # Forces Splunk to register this as an Alert, NOT a Report
-          #   dispatch.earliest_time: "rt-1m"    # Continuous 1-minute lookback window
-          #   dispatch.latest_time: "rt"         # Real-time streaming edge     
-
-          # ongoing
-          # enableSched: "1"                    # Ativa o agendamento
-          # is_rt: "1"
-          # is_scheduled: "0"                   # Força o Splunk a registar como Alerta
-          # #realtime_schedule: "1"
-          # #cron_schedule: "* * * * *"          # Executa a cada minuto
-          # dispatch.earliest_time: "rt-1m"
-          # dispatch.latest_time: "rt"
           
           # Trigger Conditions
           alert_type: "number of events"
@@ -181,6 +163,7 @@
           quantity: "0"
           alert.digest_mode: "0"              # Dispara 1 webhook individual por cada linha de log
           alert.suppress: "0"
+
           # Webhook Action
           actions: "webhook"
           action.webhook: "1"
@@ -235,8 +218,14 @@
         group: splunk
         mode: "0644"
         content: |
+          # 1. Establish app-level sharing rules
+          []
+          access = read : [ * ], write : [ admin ]
+          export = system
+
+          # 2. Expose the specific real-time alert object
           [savedsearches/{{ alert_name }}]
-          access = : [ * ], write : [ admin ]
+          access = read : [ * ], write : [ admin ]
           export = system
             
     - name: Create the index
