@@ -155,14 +155,15 @@
           #   is_scheduled: "1"                  # Forces Splunk to register this as an Alert, NOT a Report
           #   dispatch.earliest_time: "rt-1m"    # Continuous 1-minute lookback window
           #   dispatch.latest_time: "rt"         # Real-time streaming edge     
-          enableSched: "1"                    # Ativa o agendamento
+          enableSched: "0"                    # Ativa o agendamento
           is_rt: "1"
           is_scheduled: "1"                   # Força o Splunk a registar como Alerta
-          realtime_schedule: "1"
+          #realtime_schedule: "1"
           #cron_schedule: "* * * * *"          # Executa a cada minuto
-          dispatch.earliest_time: "rt-70m"
+          dispatch.earliest_time: "rt-1m"
           dispatch.latest_time: "rt"
           # Trigger Conditions
+          alert_type: "number of events"
           counttype: "number of events"
           relation: "greater than"
           quantity: "0"
