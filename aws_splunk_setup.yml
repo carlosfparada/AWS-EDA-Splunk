@@ -143,9 +143,9 @@
           # Use _index_earliest=-2m the router timestamp and only consider splunk arrival time
           search: "index=network sourcetype=cisco:ios host={{ hostvars[groups['cisco'][0]].private_ip_address }} {{ match_text }} | table _time, host, _raw"
           # Schedulling 
-          enableSched: "1"                    # Ativa o agendamento
-          is_scheduled: "1"                   # Forces Splunk to register as Alert
-          cron_schedule: "* * * * *"          # Executes every minute
+          enableSched: "1"
+          is_scheduled: "1"
+          cron_schedule: "* * * * *"
           dispatch.earliest_time: "-2m"
           dispatch.latest_time: "now"
           # Trigger Conditions
@@ -154,7 +154,7 @@
           relation: "greater than"
           quantity: "0"
           alert.track: "1"
-          alert.digest_mode: "0"              # Dispara 1 webhook individual por cada linha de log
+          alert.digest_mode: "0"
           alert.suppress: "0"
           # Webhook Action
           actions: "webhook"
