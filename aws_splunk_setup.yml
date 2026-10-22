@@ -164,25 +164,6 @@
         #   actions: "webhook"
         #   action.webhook: "1"
         #   action.webhook.param.url: "http://{{ aap_fqdn }}:{{ aap_eda_port }}"
-
-        alert_settings:
-          # Use _index_earliest=-2m the router timestamp and only consider splunk arrival time
-          search: "index=network sourcetype=cisco:ios host={{ hostvars[groups['cisco'][0]].private_ip_address }} {{ match_text }} | table _time, host, _raw"
-          ## Schedulling 
-          is_scheduled: "1"                   # Forces Splunk to register as Alert
-          enableSched: "0"                    # Ativa o agendamento
-          is_rt: "1"                          # Executes every minute
-          dispatch.earliest_time: "rt-1m"
-          dispatch.latest_time: "rt"
-          alert_type: "number of events"
-          alert_comparator: "greater than"
-          alert_threshold: = "0"
-          alert.digest_mode: "0"              # Dispara 1 webhook individual por cada linha de log
-          alert.suppress: "0"
-          # Webhook Action
-          actions: "webhook"
-          action.webhook: "1"
-          action.webhook.param.url: "http://{{ aap_fqdn }}:{{ aap_eda_port }}"
       community.general.ini_file:
         path: "/opt/splunk/etc/apps/network_alerts/local/savedsearches.conf"
         section: "{{ alert_name }}"
