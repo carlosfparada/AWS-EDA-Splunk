@@ -159,7 +159,7 @@
           is_scheduled: "0"                   # Força o Splunk a registar como Alerta
           #realtime_schedule: 1
           #cron_schedule: "* * * * *"          # Executa a cada minuto
-          dispatch.earliest_time: "rt"
+          dispatch.earliest_time: "rt-5"
           dispatch.latest_time: "rt"
           # Trigger Conditions
           counttype: "number of events"
