@@ -203,15 +203,15 @@
         label: "{{ item.key }}"
 
     - name: Set UI visibility and permissions for savedsearches
-        ansible.builtin.copy:
-          dest: "/opt/splunk/etc/apps/network_alerts/metadata/local.meta"
-          owner: splunk
-          group: splunk
-          mode: "0644"
-          content: |
-            [savedsearches/{{ alert_name }}]
-            access = : [ * ], write : [ admin ]
-            export = system
+      ansible.builtin.copy:
+        dest: "/opt/splunk/etc/apps/network_alerts/metadata/local.meta"
+        owner: splunk
+        group: splunk
+        mode: "0644"
+        content: |
+          [savedsearches/{{ alert_name }}]
+          access = : [ * ], write : [ admin ]
+          export = system
             
     - name: Create the index
       ansible.builtin.copy:
