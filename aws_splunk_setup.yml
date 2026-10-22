@@ -127,6 +127,7 @@
         content: |
           [cisco:ios]
           DATETIME_CONFIG = NONE
+          MAX_TIMESTAMP_LOOKAHEAD = 0
             
     - name: Create the alert in savedsearches.conf
       vars:
