@@ -126,6 +126,8 @@
         mode: "0644"
         content: |
           [cisco:ios]
+          SHOULD_LINEMERGE = false
+          LINE_BREAKER = ([\r\n]+)
           DATETIME_CONFIG = NONE
           MAX_TIMESTAMP_LOOKAHEAD = 0
             
