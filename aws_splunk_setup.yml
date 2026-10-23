@@ -212,7 +212,27 @@
 
 
 
-    - name: Configure Splunk Web on Port 443 with SSL
+    - name: Create systemd override directory for Splunkd
+      ansible.builtin.file:
+        path: /etc/systemd/system/Splunkd.service.d
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Configure library path and capability overrides
+      ansible.builtin.copy:
+        dest: /etc/systemd/system/Splunkd.service.d/override.conf
+        owner: root
+        group: root
+        mode: "0644"
+        content: |
+          [Service]
+          Environment="LD_LIBRARY_PATH=/opt/splunk/lib"
+          CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+          AmbientCapabilities=CAP_NET_BIND_SERVICE
+
+    - name: Configure Splunk Web for SSL on port 443
       community.general.ini_file:
         path: /opt/splunk/etc/system/local/web.conf
         section: settings
@@ -225,37 +245,12 @@
         - { option: "enableSplunkWebSSL", value: "true" }
         - { option: "httpport", value: "443" }
 
-    - name: Allow Splunk systemd service to bind to privileged ports (<1024)
-      ansible.builtin.ini_file:
-        path: /etc/systemd/system/Splunkd.service.d/override.conf
-        section: Service
-        option: CapabilityBoundingSet
-        value: CAP_NET_BIND_SERVICE
-        owner: root
-        group: root
-        mode: "0644"
-
-    - name: Grant splunkd binary permission to bind to port 443
-      community.general.capabilities:
-        path: /opt/splunk/bin/splunkd
-        capability: cap_net_bind_service+ep
-        state: present
-
-    - name: Configure systemd capability and library override for Splunkd 
-      ansible.builtin.copy:
-        dest: /etc/systemd/system/Splunkd.service.d/override.conf
-        owner: root
-        group: root
-        mode: "0644"
-        content: |
-          [Service]
-          Environment="LD_LIBRARY_PATH=/opt/splunk/lib"
-          CapabilityBoundingSet=CAP_NET_BIND_SERVICE
-          AmbientCapabilities=CAP_NET_BIND_SERVICE
-
     - name: Reload systemd daemon
       ansible.builtin.systemd:
         daemon_reload: true
+
+
+
 
 
     - name: Restart Splunk
