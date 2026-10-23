@@ -209,6 +209,34 @@
           index = network
           connection_host = ip
 
+
+
+
+    - name: Configure Splunk Web on Port 443 with SSL
+      community.general.ini_file:
+        path: /opt/splunk/etc/system/local/web.conf
+        section: settings
+        option: "{{ item.option }}"
+        value: "{{ item.value }}"
+        owner: splunk
+        group: splunk
+        mode: "0600"
+      loop:
+        - { option: "enableSplunkWebSSL", value: "true" }
+        - { option: "httpport", value: "443" }
+
+    - name: Allow Splunk systemd service to bind to privileged ports (<1024)
+      ansible.builtin.ini_file:
+        path: /etc/systemd/system/Splunkd.service.d/override.conf
+        section: Service
+        option: CapabilityBoundingSet
+        value: CAP_NET_BIND_SERVICE
+        owner: root
+        group: root
+        mode: "0644"
+      notify: Reload systemd
+
+
     - name: Restart Splunk
       ansible.builtin.systemd:
         name: Splunkd
