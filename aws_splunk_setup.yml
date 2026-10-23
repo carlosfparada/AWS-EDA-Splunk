@@ -209,50 +209,6 @@
           index = network
           connection_host = ip
 
-
-
-
-    - name: Create systemd override directory for Splunkd
-      ansible.builtin.file:
-        path: /etc/systemd/system/Splunkd.service.d
-        state: directory
-        owner: root
-        group: root
-        mode: "0755"
-
-    - name: Configure library path and capability overrides
-      ansible.builtin.copy:
-        dest: /etc/systemd/system/Splunkd.service.d/override.conf
-        owner: root
-        group: root
-        mode: "0644"
-        content: |
-          [Service]
-          Environment="LD_LIBRARY_PATH=/opt/splunk/lib"
-          CapabilityBoundingSet=CAP_NET_BIND_SERVICE
-          AmbientCapabilities=CAP_NET_BIND_SERVICE
-
-    - name: Configure Splunk Web for SSL on port 443
-      community.general.ini_file:
-        path: /opt/splunk/etc/system/local/web.conf
-        section: settings
-        option: "{{ item.option }}"
-        value: "{{ item.value }}"
-        owner: splunk
-        group: splunk
-        mode: "0600"
-      loop:
-        - { option: "enableSplunkWebSSL", value: "true" }
-        - { option: "httpport", value: "443" }
-
-    - name: Reload systemd daemon
-      ansible.builtin.systemd:
-        daemon_reload: true
-
-
-
-
-
     - name: Restart Splunk
       ansible.builtin.systemd:
         name: Splunkd
