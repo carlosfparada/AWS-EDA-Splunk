@@ -236,6 +236,14 @@
         mode: "0644"
       notify: Reload systemd
 
+    - name: Grant splunkd binary permission to bind to port 443
+      community.general.capabilities:
+        path: /opt/splunk/bin/splunkd
+        capability: cap_net_bind_service+ep
+        state: present
+
+
+
 
     - name: Restart Splunk
       ansible.builtin.systemd:
