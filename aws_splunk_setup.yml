@@ -209,6 +209,13 @@
           index = network
           connection_host = ip
 
+    - name: Forward port 443 to Splunk Web port 8000
+      ansible.posix.firewalld:
+        rich_rule: rule family="ipv4" forward-port port="443" protocol="tcp" to-port="8000"
+        permanent: true
+        state: enabled
+        immediate: true
+
     - name: Restart Splunk
       ansible.builtin.systemd:
         name: Splunkd
