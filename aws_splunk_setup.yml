@@ -241,7 +241,21 @@
         capability: cap_net_bind_service+ep
         state: present
 
+    - name: Configure systemd capability and library override for Splunkd 
+      ansible.builtin.copy:
+        dest: /etc/systemd/system/Splunkd.service.d/override.conf
+        owner: root
+        group: root
+        mode: "0644"
+        content: |
+          [Service]
+          Environment="LD_LIBRARY_PATH=/opt/splunk/lib"
+          CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+          AmbientCapabilities=CAP_NET_BIND_SERVICE
 
+    - name: Reload systemd daemon
+      ansible.builtin.systemd:
+        daemon_reload: true
 
 
     - name: Restart Splunk
