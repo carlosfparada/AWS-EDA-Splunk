@@ -12,10 +12,8 @@
 - name: Setup RHEL Splunk
   hosts: splunk
   become: true
+  gather_facts: no
   tasks:
-    - debug:
-        var: inventory_hostname
-
     # - name: Attach Red Hat subscription
     #   community.general.redhat_subscription:
     #     state: present
@@ -26,7 +24,7 @@
 
     - name: Download Splunk RPM
       ansible.builtin.get_url:
-        url: "https://download.splunk.com/products/splunk/releases/10.6.1.1/linux/splunk-10.6.1.1-b2ae2962645c.x86_64.rpm"
+        url: "{{ splunk_download }}"
         dest: /tmp/splunk.rpm
         
     - name: Install Splunk RPM
@@ -70,17 +68,17 @@
       args:
         creates: /etc/systemd/system/Splunkd.service
 
-    - name: Start Splunk and enable at boot
-      ansible.builtin.systemd:
-        name: Splunkd
-        state: restarted
-        enabled: true
+    # - name: Start Splunk and enable at boot
+    #   ansible.builtin.systemd:
+    #     name: Splunkd
+    #     state: restarted
+    #     enabled: true
 
  
-- name: Send Cisco events from Splunk to Event-Driven Ansible
-  hosts: splunk
-  become: true
-  tasks:
+# - name: Send Cisco events from Splunk to Event-Driven Ansible
+#   hosts: splunk
+#   become: true
+#   tasks:
     - name: Make sure the app directories exist
       ansible.builtin.file:
         path: "{{ item }}"
@@ -91,6 +89,7 @@
       loop:
         - "/opt/splunk/etc/apps/network_alerts"
         - "/opt/splunk/etc/apps/network_alerts/local"
+        - "/opt/splunk/etc/apps/network_alerts/metadata"
 
     - name: Create app.conf for the custom app
       ansible.builtin.copy:
@@ -124,10 +123,6 @@
         owner: splunk
         group: splunk
         mode: "0644"
-        # content: |
-        #   [cisco:ios]
-        #   SHOULD_LINEMERGE = false
-        #   LINE_BREAKER = ([\r\n]+)
         content: |
           [cisco:ios]
           SHOULD_LINEMERGE = false
@@ -141,7 +136,7 @@
       vars:
         alert_settings:
           # Use _index_earliest=-2m the router timestamp and only consider splunk arrival time
-          search: "index=network sourcetype=cisco:ios host={{ hostvars[groups['cisco'][0]].private_ip_address }} {{ match_text }} | table _time, host, _raw"
+          search: "index=network sourcetype=cisco:ios host={{ hostvars[groups['cisco'][0]].private_ip_address }} {{ splunk_match_text }} | table _time, host, _raw"
           # Schedulling 
           enableSched: "1"
           is_scheduled: "1"
@@ -162,7 +157,7 @@
           action.webhook.param.url: "http://{{ aap_fqdn }}:{{ aap_eda_port }}"
       community.general.ini_file:
         path: "/opt/splunk/etc/apps/network_alerts/local/savedsearches.conf"
-        section: "{{ alert_name }}"
+        section: "{{ splunk_alert_name }}"
         option: "{{ item.key }}"
         value: "{{ item.value }}"
         owner: splunk
@@ -171,18 +166,6 @@
       loop: "{{ alert_settings | dict2items }}"
       loop_control:
         label: "{{ item.key }}"
-
-    - name: Make sure the app directories exist
-      ansible.builtin.file:
-        path: "{{ item }}"
-        state: directory
-        owner: splunk
-        group: splunk
-        mode: "0755"
-      loop:
-        - "/opt/splunk/etc/apps/network_alerts"
-        - "/opt/splunk/etc/apps/network_alerts/local"
-        - "/opt/splunk/etc/apps/network_alerts/metadata"
     
     - name: Set UI visibility and permissions for savedsearches
       ansible.builtin.copy:
@@ -197,7 +180,7 @@
           export = system
 
           # 2. Expose the specific real-time alert object
-          [savedsearches/{{ alert_name | replace(' ', '%20') }}]
+          [savedsearches/{{ splunk_alert_name | replace(' ', '%20') }}]
           access = read : [ * ], write : [ admin ]
           export = app
           owner = admin

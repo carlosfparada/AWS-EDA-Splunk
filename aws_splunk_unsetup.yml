@@ -13,14 +13,11 @@
   hosts: splunk
   become: true
   tasks:
-    - debug:
-        var: inventory_hostname
-
-    - name: Dettach Red Hat subscription
-      community.general.redhat_subscription:
-        state: absent
-        username: "{{ subscription_user }}"
-        password: "{{ subscription_pass }}"
-        pool_ids: "{{ rh_subs_pool_id }}"
-      become: true
+    # - name: Dettach Red Hat subscription
+    #   community.general.redhat_subscription:
+    #     state: absent
+    #     username: "{{ subscription_user }}"
+    #     password: "{{ subscription_pass }}"
+    #     pool_ids: "{{ rh_subs_pool_id }}"
+    #   become: true
 
