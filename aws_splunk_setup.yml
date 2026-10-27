@@ -28,9 +28,14 @@
         state: present
       vars:
         packages:
-          - httpd
+          - firewall
       become: yes
-      
+
+    - ansible.builtin.service:
+        name: firewalld
+        state: started
+        enabled: true
+
     - name: Dettach Red Hat subscription
       community.general.redhat_subscription:
         state: absent
