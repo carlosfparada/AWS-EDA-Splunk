@@ -220,7 +220,8 @@
         state: present
       vars:
         packages:
-          - firewall
+          - firewalld
+          - python3-firewall
       become: yes
 
     - ansible.builtin.service:
