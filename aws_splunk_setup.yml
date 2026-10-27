@@ -238,6 +238,14 @@
         state: enabled
         immediate: true
 
+    - name: Allow UDP logging 1514 through firewalld
+      ansible.posix.firewalld:
+        port: 1514/udp
+        permanent: true
+        state: enabled
+        immediate: true
+      ignore_errors: true
+      
     - name: Dettach Red Hat subscription
       community.general.redhat_subscription:
         state: absent
