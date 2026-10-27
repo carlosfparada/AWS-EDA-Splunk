@@ -14,13 +14,30 @@
   become: true
   gather_facts: no
   tasks:
-    # - name: Attach Red Hat subscription
-    #   community.general.redhat_subscription:
-    #     state: present
-    #     username: "{{ subscription_user }}"
-    #     password: "{{ subscription_pass }}"
-    #     pool_ids: "{{ rh_subs_pool_id }}"
-    #   become: true
+    - name: Attach Red Hat subscription
+      community.general.redhat_subscription:
+        state: present
+        username: "{{ subscription_user }}"
+        password: "{{ subscription_pass }}"
+        pool_ids: "{{ rh_subs_pool_id }}"
+      become: true
+
+    - name: Install Software
+      ansible.builtin.dnf:
+        name: "{{ packages }}"
+        state: present
+      vars:
+        packages:
+          - httpd
+      become: yes
+      
+    - name: Dettach Red Hat subscription
+      community.general.redhat_subscription:
+        state: absent
+        username: "{{ subscription_user }}"
+        password: "{{ subscription_pass }}"
+        pool_ids: "{{ rh_subs_pool_id }}"
+      become: true
 
     - name: Download Splunk RPM
       ansible.builtin.get_url:
