@@ -14,43 +14,6 @@
   become: true
   gather_facts: no
   tasks:
-    - name: Attach Red Hat subscription
-      community.general.redhat_subscription:
-        state: present
-        username: "{{ subscription_user }}"
-        password: "{{ subscription_pass }}"
-        pool_ids: "{{ rh_subs_pool_id }}"
-      become: true
-
-    - name: Install Software
-      ansible.builtin.dnf:
-        name: "{{ packages }}"
-        state: present
-      vars:
-        packages:
-          - firewall
-      become: yes
-
-    - ansible.builtin.service:
-        name: firewalld
-        state: started
-        enabled: true
-
-    - name: Forward port 443 to Splunk Web port 8000
-      ansible.posix.firewalld:
-        rich_rule: rule family="ipv4" forward-port port="443" protocol="tcp" to-port="8000"
-        permanent: true
-        state: enabled
-        immediate: true
-
-    - name: Dettach Red Hat subscription
-      community.general.redhat_subscription:
-        state: absent
-        username: "{{ subscription_user }}"
-        password: "{{ subscription_pass }}"
-        pool_ids: "{{ rh_subs_pool_id }}"
-      become: true
-
     - name: Download Splunk RPM
       ansible.builtin.get_url:
         url: "{{ splunk_download_url }}"
@@ -242,6 +205,43 @@
       ansible.builtin.systemd:
         name: Splunkd
         state: restarted
+
+    - name: Attach Red Hat subscription
+      community.general.redhat_subscription:
+        state: present
+        username: "{{ subscription_user }}"
+        password: "{{ subscription_pass }}"
+        pool_ids: "{{ rh_subs_pool_id }}"
+      become: true
+
+    - name: Install Software
+      ansible.builtin.dnf:
+        name: "{{ packages }}"
+        state: present
+      vars:
+        packages:
+          - firewall
+      become: yes
+
+    - ansible.builtin.service:
+        name: firewalld
+        state: started
+        enabled: true
+
+    - name: Forward port 443 to Splunk Web port 8000
+      ansible.posix.firewalld:
+        rich_rule: rule family="ipv4" forward-port port="443" protocol="tcp" to-port="8000"
+        permanent: true
+        state: enabled
+        immediate: true
+
+    - name: Dettach Red Hat subscription
+      community.general.redhat_subscription:
+        state: absent
+        username: "{{ subscription_user }}"
+        password: "{{ subscription_pass }}"
+        pool_ids: "{{ rh_subs_pool_id }}"
+      become: true
 
 
 - name: Cisco setup
