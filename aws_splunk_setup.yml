@@ -222,6 +222,7 @@
         packages:
           - firewalld
           - python3-firewall
+          - tcpdump
       become: yes
 
     - name: Start firewalld service
