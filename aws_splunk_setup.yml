@@ -214,7 +214,7 @@
         pool_ids: "{{ rh_subs_pool_id }}"
       become: true
 
-    - name: Install Software
+    - name: Install Software firewalld
       ansible.builtin.dnf:
         name: "{{ packages }}"
         state: present
@@ -224,7 +224,8 @@
           - python3-firewall
       become: yes
 
-    - ansible.builtin.service:
+    - name: Start firewalld service
+      ansible.builtin.service:
         name: firewalld
         state: started
         enabled: true
