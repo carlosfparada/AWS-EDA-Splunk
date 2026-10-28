@@ -1,12 +1,12 @@
 ---
 
-- name: Get nodes from Inventory and add to Groups
-  hosts: localhost
-  connection: local
-  gather_facts: no
-  tasks:
-  - include_role: 
-      name: utils_hosts_aws
+# - name: Get nodes from Inventory and add to Groups
+#   hosts: localhost
+#   connection: local
+#   gather_facts: no
+#   tasks:
+#   - include_role: 
+#       name: utils_hosts_aws
 
 - name: Restart Cisco Interface
   hosts: "{{ host_name }}"
