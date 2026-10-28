@@ -8,7 +8,7 @@
 #   - include_role: 
 #       name: utils_hosts_aws
 
-- name: Restart Cisco Interface
+- name: Enable Cisco Interface
   hosts: "{{ host_name }}"
   gather_facts: false
   vars:
@@ -22,7 +22,7 @@
           - name: "{{ interface_name }}"
             enabled: true
 
-# - name: Restart Cisco Interface
+# - name: Enable Cisco Interface
 #   hosts: cisco
 #   gather_facts: false
 #   vars:
