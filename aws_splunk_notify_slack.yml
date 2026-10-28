@@ -1,0 +1,15 @@
+---
+
+- name: Notify Slack
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  vars_files: vars/main.yml
+  tasks:
+    # Slack Setup: https://www.youtube.com/shorts/jcPnBYB5qww 
+    - name: Send notification message via Slack
+      community.general.slack:
+        token: "{{ slack_token }}"
+        channel: "#ansible-demos"
+        username: "Ansible Demos"
+        msg: "Potential Log In Authentication Attack {{ ansible_eda }}"
