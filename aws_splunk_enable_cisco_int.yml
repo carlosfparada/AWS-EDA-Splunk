@@ -16,7 +16,7 @@
     ansible_network_os: cisco.ios.ios
     ansible_command_timeout: 300
   tasks:
-    - name: Restart Interface 
+    - name: Enable Interface 
       cisco.ios.ios_interfaces:
         config:
           - name: "{{ interface_name }}"
