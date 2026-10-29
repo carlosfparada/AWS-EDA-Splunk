@@ -299,13 +299,14 @@
     ansible_network_os: cisco.ios.ios
     ansible_command_timeout: 300
   tasks:
-    - name: Send syslog to Splunk
+    - name: Send syslog to Splunk and Set login block policy
       cisco.ios.ios_config:
         lines:
           - service timestamps log datetime msec localtime show-timezone
           - logging source-interface GigabitEthernet 1
           - "logging host {{ groups['splunk'][0] }} transport udp port 1514"
           - logging trap informational
+          - login block-for 20 attempts 3 within 10
         save_when: modified
 
 
