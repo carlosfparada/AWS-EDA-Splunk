@@ -1,0 +1,471 @@
+{
+  "name": "AIOps: Cisco Splunk",
+  "edges": [
+    {
+      "to": "activity_ceeb9d64_4405_4c00_adc1_71c12865f7c4",
+      "from": "activity_2f76a2b9_110c_444c_bab0_f8793eb7d364"
+    },
+    {
+      "to": "logic_1793115598126_hvz4it1ifm8k7",
+      "from": "activity_ceeb9d64_4405_4c00_adc1_71c12865f7c4"
+    },
+    {
+      "to": "activity_026c0d6b_9d9c_4338_a095_9d872bcf6586",
+      "from": "logic_1793115598126_hvz4it1ifm8k7",
+      "from_port": "case_1"
+    },
+    {
+      "to": "activity_16baf739_39fd_4822_9ccf_6bacb4f2b6c5",
+      "from": "activity_026c0d6b_9d9c_4338_a095_9d872bcf6586"
+    },
+    {
+      "to": "activity_ea127657_6706_45ab_a8bc_9f43b6207057",
+      "from": "activity_d68ed903_58da_4568_95ef_454bf7fae9e4"
+    },
+    {
+      "to": "activity_d81d8af1_4b3f_4781_bff9_e6bfc8b58457",
+      "from": "activity_ea127657_6706_45ab_a8bc_9f43b6207057",
+      "from_port": "approved"
+    },
+    {
+      "to": "activity_f77d0a3b_020d_4538_9f79_0d544e689a10",
+      "from": "logic_1793115598126_hvz4it1ifm8k7",
+      "from_port": "case_0"
+    },
+    {
+      "to": "activity_7b92638d_5937_4a9a_9f3b_24d547cec6b6",
+      "from": "activity_f77d0a3b_020d_4538_9f79_0d544e689a10"
+    },
+    {
+      "to": "activity_96169859_8105_40b1_8351_51c05de24b37",
+      "from": "activity_16baf739_39fd_4822_9ccf_6bacb4f2b6c5"
+    },
+    {
+      "to": "activity_d68ed903_58da_4568_95ef_454bf7fae9e4",
+      "from": "activity_96169859_8105_40b1_8351_51c05de24b37"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "activity_026c0d6b_9d9c_4338_a095_9d872bcf6586",
+      "name": "Send Slack Message",
+      "type": "agentic",
+      "position": {
+        "x": -190.45566914108355,
+        "y": -176.44278578722674
+      },
+      "settings": {},
+      "parameters": {
+        "prompt": "You are a notification component. Send a Slack notification for the Cisco alert below by launching an AAP Job Template through the Ansible MCP (use \"discover\" with the job_management toolset only; do not open any other toolset).\n\n<log>\n${trigger}\n</log>\n\nSteps:\n1. Write a plain-text message of at most 6 lines: \"[SEVERITY] <device IP> - <event name>\", a one-sentence explanation, and the key details from the log (interface, source IP, neighbor). Use only facts from the log. Replace any password or secret with ***.\n2. Find the Job Template to Notify Slack and launch it once with extra_vars {\"slack_message\": \"<message>\"} (valid JSON, line breaks as \\n). Do not pass any other variable, especially not the token, which has a default.\n3. Do not create or change anything else. If the template is missing or the launch fails, do not retry; report the failure.\n\nRespond ONLY with this JSON, no markdown or extra text:\n{\"result\":{\"content\":{\"notified\":\"true or false as a string\",\"message\":\"short result or failure reason\"}}}",
+        "llm_model_id": "7df9cb57-b161-4c33-ad5a-c28ba5e56c21",
+        "credential_id": "5857020d-da46-4c19-ad3a-6a811a3a2388",
+        "tool_selections": [
+          "0982d88c-afc2-49c1-92db-4866c30a1598",
+          "528a12cf-d72d-4e9f-88e7-d9e86b8e9ba4",
+          "6fe46bbe-ad29-44b9-a11c-7fb06a658281",
+          "cb52ed73-ad54-4e82-8398-412427122f76",
+          "3a49fca6-987c-4191-bcf1-2d1a487bd49a",
+          "a542eb80-bf39-49f2-9e44-84152e3f8eae",
+          "00e3aaf3-4981-40ac-9e0c-4e4fd264d442",
+          "659948f7-e560-429d-bdbb-f3454edd6446",
+          "8a44c95c-e56e-46f6-986f-c65dccfd01b7",
+          "600133e4-e90c-498a-8bdd-a65b07d5092f",
+          "6486e5b2-7a1b-43c8-b915-f4f7c04358e0",
+          "cfec0394-1af1-46a8-8675-83ddbde81f0d",
+          "0bc936bd-5958-4ae6-9576-26f84455f152",
+          "f1a8b217-b6e1-460c-b5e7-009cf68fed97",
+          "78d56c1b-4a8a-4108-a8ce-5160be362390",
+          "d642cd69-10fe-41af-8b2a-aa881a3e0b13",
+          "34931270-cd7b-4ad4-8eeb-b815c8a793af",
+          "aa4963c5-49d2-4a06-9e62-25c2f44ffe39",
+          "9765a0cd-ee81-4bc6-83c6-0f42e6a271ef",
+          "e5fd271a-2875-4ee3-88c6-b2c3cf26a8c0",
+          "f008caad-0b54-4c37-9ec7-4376d3dc5530",
+          "4cbc570a-2ae7-4386-b54a-0a506a68554a",
+          "374c4031-128d-4678-b6f8-52560690e9d1",
+          "b5631213-3ba6-45d0-bdbb-2c429205dd37",
+          "778de82f-6e16-4632-a821-7940301512af",
+          "369dd96e-707b-4a49-b66b-b00db8b9cf16",
+          "1371a498-de42-4bd1-ac1e-2a74a95b8ad7",
+          "bc097466-fa0e-40f0-a8a9-e497601e4973",
+          "f085dade-1e24-49f3-b6ce-e768a0e176fb",
+          "a7df14af-3da3-4a63-ba3c-8c47bba0c177",
+          "2161f820-b4d1-498b-b87d-b7d8cad6e725",
+          "efa6a26b-2865-4974-8aa3-b2c5f707639a",
+          "92493835-da9d-472e-973d-d4be92273940",
+          "85f1d458-5bb0-4b8e-9e04-e9bc58fdec5c",
+          "1dafc3f3-0efd-4091-a956-2538f4aa83fd",
+          "e9adbe7a-1dc5-4e99-94bb-1bc17085fecf",
+          "4946a594-1c93-4f89-ba55-c91690d2ed6a",
+          "b1db63de-a8b5-4d27-8156-9c8fec0e3da1",
+          "9b505e65-4094-41da-8c15-c0e514ce8bec",
+          "57cbb480-222f-444a-90c3-f441aa10bb8b",
+          "ac46a504-b893-465a-83c4-eb2290795eef",
+          "58056b01-816a-4883-bce0-fd0ade3cfd8e",
+          "61b00e94-7d88-424c-bf60-d43be2d6404a",
+          "cde54c89-21eb-4bec-833b-0b62da7fb0af",
+          "eeb1b4e6-8abe-4b2e-9ea6-3f042dbefccd",
+          "966a0e7f-c992-4490-a222-d939fa49c43c",
+          "50c22263-bb6f-48c2-a500-4f734de4f956",
+          "785adb1f-9669-4761-82b2-0f70b46240e3"
+        ],
+        "integration_connections": [
+          {
+            "credential_id": "68f2d7d2-fe6b-4f57-813a-6b2eb12a1d38",
+            "integration_id": "02b72616-c6bc-4f2a-9acd-52b0d931f72a"
+          },
+          {
+            "credential_id": "1986b2b1-efbd-464d-af0d-5a16b27eb8e6",
+            "integration_id": "7d0b58e5-0b39-4f93-877e-248350027785"
+          }
+        ],
+        "tool_selection_strategy": "SELECTED"
+      }
+    },
+    {
+      "id": "activity_16baf739_39fd_4822_9ccf_6bacb4f2b6c5",
+      "name": "Create Fix Automation",
+      "type": "agentic",
+      "position": {
+        "x": 226.4973586428256,
+        "y": -177.234778936914
+      },
+      "settings": {},
+      "parameters": {
+        "prompt": "You are a network automation-builder. You receive a Cisco IOS alert, write an Ansible playbook that fixes it, and commit it to GitHub. You do not touch AAP.\n\n<log>\n${trigger}\n</log>\n\n# Tools\nUse ONLY the GitHub MCP tools in your tool list. Never call \"discover\". Do not use any other tool.\nRepository: owner \"carlosfparada\", repo \"AWS-AIOps-fixes\", branch \"main\".\n\n# Steps\n1. ANALYZE (no tool call): Read the log and identify:\n   - the event mnemonic (e.g. %AAA-6-USER_PRIVILEGE_UPDATE)\n   - the device IP\n   - every parameter the fix needs (user, interface, source IP, etc.), using only facts in the log\n   If the event is a protection working as designed (e.g. login quiet mode), the log is unclear, or the fix needs a forbidden action, go straight to the output with success \"false\" and message \"no safe automated fix\". Do not call any tool.\n\n2. NAME (no tool call): decide the names now.\n   - slug: take the mnemonic, remove the leading \"%\", lowercase it, and replace \"_\" and any other non-alphanumeric character with \"-\".\n     Example: %AAA-6-USER_PRIVILEGE_UPDATE -> aaa-6-user-privilege-update\n   - file name: \"playbook-\" + slug + \".yml\"\n     Example: playbook-aaa-6-user-privilege-update.yml\n   Remember these exact values. You will use them in the commit and in the output.\n\n3. WRITE THE PLAYBOOK (no tool call):\n   - Valid YAML starting with \"---\", one play only.\n   - hosts: \"{{ host_name }}\", connection: ansible.netcommon.network_cli, vars: ansible_network_os: cisco.ios.ios.\n   - Use only cisco.ios modules and ansible.builtin.assert/debug.\n   - Every parameter comes from extra_vars. Never hardcode values from the log, IPs or hostnames.\n   - First task: assert that every required variable is defined, non-empty, and not protected (admin, ansible, ansible_user, the management interface, private or loopback IPs when blocking addresses).\n   - Change only what the problem requires, idempotently, supporting check mode where possible.\n   - Last tasks: verify the result, with failed_when false and changed_when false on read-only commands.\n   - No passwords, tokens or secrets.\n   - Forbidden: reload, erase, delete, copy to startup-config, management interface, routing, AAA servers, disabling logging or other security protections, any change beyond the single target device.\n\n4. COMMIT: Make ONE commit call with the file name from step 2, commit message \"Add fix: <short description>\".\n   - If it fails because the file already exists or a sha is required, call get_file_contents ONCE to get the sha, then repeat the commit ONCE with that sha.\n   - If it fails again, stop and report the exact error in \"message\".\n   - Never make more than 3 tool calls in total.\n\n5. After a successful commit, do not call any more tools. Do not read the file back or verify. Go directly to the output.\n\n# Output\nRespond ONLY with this valid JSON, no markdown or extra text. Every field must be filled:\n{\"result\":{\"content\":{\"success\":\"true or false as a string\",\"slug\":\"slug from step 2\",\"playbook\":\"exact file name from step 2\",\"device_ip\":\"IP from the log\",\"parameters\":{\"<param_name>\":\"<value from the log>\"},\"message\":\"short result or exact error text\"}}}\n\nRules for the output:\n- \"playbook\" is the exact file name you committed. It must never be empty when success is \"true\".\n- \"parameters\" lists the variable names the playbook uses (except host_name) with their values from the log.\n- Boolean-like values must be the strings \"true\" or \"false\", never JSON booleans.\n- If success is \"true\" and \"playbook\" would be empty, you made a mistake: fill it with the file name from step 2.",
+        "llm_model_id": "7df9cb57-b161-4c33-ad5a-c28ba5e56c21",
+        "credential_id": "5857020d-da46-4c19-ad3a-6a811a3a2388",
+        "tool_selections": [
+          "6fe46bbe-ad29-44b9-a11c-7fb06a658281",
+          "cb52ed73-ad54-4e82-8398-412427122f76",
+          "3a49fca6-987c-4191-bcf1-2d1a487bd49a",
+          "a542eb80-bf39-49f2-9e44-84152e3f8eae",
+          "00e3aaf3-4981-40ac-9e0c-4e4fd264d442",
+          "659948f7-e560-429d-bdbb-f3454edd6446",
+          "8a44c95c-e56e-46f6-986f-c65dccfd01b7",
+          "600133e4-e90c-498a-8bdd-a65b07d5092f",
+          "6486e5b2-7a1b-43c8-b915-f4f7c04358e0",
+          "cfec0394-1af1-46a8-8675-83ddbde81f0d",
+          "0bc936bd-5958-4ae6-9576-26f84455f152",
+          "f1a8b217-b6e1-460c-b5e7-009cf68fed97",
+          "78d56c1b-4a8a-4108-a8ce-5160be362390",
+          "d642cd69-10fe-41af-8b2a-aa881a3e0b13",
+          "34931270-cd7b-4ad4-8eeb-b815c8a793af",
+          "aa4963c5-49d2-4a06-9e62-25c2f44ffe39",
+          "9765a0cd-ee81-4bc6-83c6-0f42e6a271ef",
+          "e5fd271a-2875-4ee3-88c6-b2c3cf26a8c0",
+          "f008caad-0b54-4c37-9ec7-4376d3dc5530",
+          "4cbc570a-2ae7-4386-b54a-0a506a68554a",
+          "374c4031-128d-4678-b6f8-52560690e9d1",
+          "b5631213-3ba6-45d0-bdbb-2c429205dd37",
+          "778de82f-6e16-4632-a821-7940301512af",
+          "369dd96e-707b-4a49-b66b-b00db8b9cf16",
+          "1371a498-de42-4bd1-ac1e-2a74a95b8ad7",
+          "bc097466-fa0e-40f0-a8a9-e497601e4973",
+          "f085dade-1e24-49f3-b6ce-e768a0e176fb",
+          "a7df14af-3da3-4a63-ba3c-8c47bba0c177",
+          "2161f820-b4d1-498b-b87d-b7d8cad6e725",
+          "efa6a26b-2865-4974-8aa3-b2c5f707639a",
+          "92493835-da9d-472e-973d-d4be92273940",
+          "85f1d458-5bb0-4b8e-9e04-e9bc58fdec5c",
+          "1dafc3f3-0efd-4091-a956-2538f4aa83fd",
+          "e9adbe7a-1dc5-4e99-94bb-1bc17085fecf",
+          "4946a594-1c93-4f89-ba55-c91690d2ed6a",
+          "b1db63de-a8b5-4d27-8156-9c8fec0e3da1",
+          "9b505e65-4094-41da-8c15-c0e514ce8bec",
+          "57cbb480-222f-444a-90c3-f441aa10bb8b",
+          "ac46a504-b893-465a-83c4-eb2290795eef",
+          "58056b01-816a-4883-bce0-fd0ade3cfd8e",
+          "61b00e94-7d88-424c-bf60-d43be2d6404a",
+          "cde54c89-21eb-4bec-833b-0b62da7fb0af",
+          "eeb1b4e6-8abe-4b2e-9ea6-3f042dbefccd",
+          "966a0e7f-c992-4490-a222-d939fa49c43c",
+          "50c22263-bb6f-48c2-a500-4f734de4f956",
+          "785adb1f-9669-4761-82b2-0f70b46240e3"
+        ],
+        "integration_connections": [
+          {
+            "credential_id": "1986b2b1-efbd-464d-af0d-5a16b27eb8e6",
+            "integration_id": "7d0b58e5-0b39-4f93-877e-248350027785"
+          },
+          {
+            "credential_id": "68f2d7d2-fe6b-4f57-813a-6b2eb12a1d38",
+            "integration_id": "02b72616-c6bc-4f2a-9acd-52b0d931f72a"
+          }
+        ],
+        "tool_selection_strategy": "SELECTED"
+      }
+    },
+    {
+      "id": "activity_96169859_8105_40b1_8351_51c05de24b37",
+      "name": "Sync Project",
+      "type": "aap_job_template",
+      "position": {
+        "x": 633.1070060031487,
+        "y": -130.29358444224238
+      },
+      "parameters": {
+        "diff_mode": false,
+        "credential_id": "9f779d41-702d-4bb6-9fcd-5623833db808",
+        "integration_id": "40860539-25ec-463f-a11b-9986eab3854a",
+        "job_template_id": 99,
+        "job_template_name": "AWS Splunk: Sync Project",
+        "organization_name": "Default"
+      }
+    },
+    {
+      "id": "activity_ceeb9d64_4405_4c00_adc1_71c12865f7c4",
+      "name": "Network Operations Triage",
+      "type": "agentic",
+      "position": {
+        "x": -1021.4620634091818,
+        "y": -404.09832797624676
+      },
+      "settings": {},
+      "parameters": {
+        "prompt": "You are a network operations triage component. You receive an alert/log from a Cisco device and determine whether an Ansible Job Template exists that can fix the problem.\n\n# Input\n<log>\n${trigger}\n</log>\n\n# Procedure\n1. You MUST call the Ansible MCP tool that lists Job Templates before answering. Never answer without calling it. If the result is paginated or truncated, fetch all pages.\n2. Read the log and identify the problem, then translate it into the remediation action that would fix it. Examples:\n   - interface down / link down / administratively down -> enable interface, no shutdown, bring up, bounce/reset interface\n   - BGP neighbor down -> restart/clear BGP session\n   - high CPU -> clear processes, restart service\n3. Compare that remediation action against the name AND description of EVERY Job Template. Match by meaning, not exact wording. A template whose purpose is to perform the remediation action counts as a fix, even if its name does not repeat the words in the log.\n   Example: log says \"Interface GigabitEthernet0/1 changed state to down\" and a template is named \"Enable Interface\" -> fix_available is \"true\".\n4. Set fix_available to \"true\" if at least one template performs the remediation action for this problem, even if it is not a perfect match.\n5. Set fix_available to \"false\" only if you called the tool, reviewed all templates, and none of them performs a relevant remediation.\n6. Do NOT launch or run any Job Template.\n\n# Output rules (strict)\n- Respond with ONLY the JSON object. No explanations, no markdown, no code fences, no text before or after.\n- \"fix_available\" must be the JSON string \"true\" or \"false\" (lowercase, in double quotes). Never a boolean.\n- Do not add, remove, or rename any keys.\n\n{\"result\":{\"content\":{\"fix_available\":\"true\"}}}\nor\n{\"result\":{\"content\":{\"fix_available\":\"false\"}}}\n",
+        "llm_model_id": "7df9cb57-b161-4c33-ad5a-c28ba5e56c21",
+        "credential_id": "5857020d-da46-4c19-ad3a-6a811a3a2388",
+        "response_schema": {
+          "type": "object",
+          "required": [
+            "fix_available"
+          ],
+          "properties": {
+            "fix_available": {
+              "type": "string",
+              "default": "",
+              "description": "Whether a vetted, automated remediation exists for this event."
+            }
+          },
+          "additionalProperties": false
+        },
+        "tool_selections": [
+          "528a12cf-d72d-4e9f-88e7-d9e86b8e9ba4",
+          "0982d88c-afc2-49c1-92db-4866c30a1598"
+        ],
+        "integration_connections": [
+          {
+            "credential_id": "68f2d7d2-fe6b-4f57-813a-6b2eb12a1d38",
+            "integration_id": "02b72616-c6bc-4f2a-9acd-52b0d931f72a"
+          }
+        ],
+        "tool_selection_strategy": "SELECTED"
+      }
+    },
+    {
+      "id": "activity_d68ed903_58da_4568_95ef_454bf7fae9e4",
+      "name": "Create Artifacts (+ Check Mode)",
+      "type": "agentic",
+      "position": {
+        "x": 918.7371423440148,
+        "y": -177.72814808198868
+      },
+      "settings": {},
+      "parameters": {
+        "prompt": "You are a network automation executor. You create or overwrite an AAP Job Template for an existing playbook and validate it in CHECK MODE ONLY, using the Ansible MCP. You do not touch GitHub.\n\n<log>\n${trigger}\n</log>\n\n# Tools\nUse only the Ansible MCP through \"discover\". Open only job_management and inventory_management, once each. Do not open any other toolset. Do not search jobs or list unrelated objects.\n\n# Fixed values (use these numbers, do not search for them)\n- Project ID: 63 (\"AWS Splunk AO Remediation Project\")\n- Inventory ID: 3 (\"AWS Inventory\")\n- Credential ID: 7 (\"AWS Splunk Credential\")\n- Playbook: playbook-aaa-6-user-privilege-update.yml\n- Template name: \"AWS Splunk: Fix aaa-6-user-privilege-update\"\n- Survey variables: host_name, rogue_user\n\n# Steps (stop at the first failure and report the exact error)\n0. If the log does not contain \"%AAA-6-USER_PRIVILEGE_UPDATE\", stop with \"unsupported event\".\n\n1. SYNC (mandatory, always first): Launch a project update (sync) for project 63. Then check the project status, at most 6 times, until it is \"successful\". If it ends \"failed\" or \"error\", or is still not successful after 6 checks, stop and report the status. Do NOT create or update the template until the sync is \"successful\".\n\n2. PLAYBOOK CHECK: List the playbooks of project 63. If playbook-aaa-6-user-privilege-update.yml is not in the list, stop and report the list you saw.\n\n3. FIND: Look up the Job Template named \"AWS Splunk: Fix aaa-6-user-privilege-update\". Remember its ID if it exists.\n\n4. CREATE OR OVERWRITE:\n   - If it does not exist, create it. If it exists, update it (same ID). Never create a second template with the same name.\n   - Set exactly these values in both cases: name \"AWS Splunk: Fix aaa-6-user-privilege-update\", project 63, playbook \"playbook-aaa-6-user-privilege-update.yml\", inventory 3, job_type \"check\", survey_enabled true.\n   a. Create or update the template with the values above.\n   b. Make sure credential 7 is attached (add it if missing; do not add it twice).\n   c. Set the survey spec (separate call, replaces any existing survey): two required text questions, named exactly host_name and rogue_user.\n\n5. HOST LOOKUP: From the log, extract the device IP and rogue_user (pattern \"username: <name> privilege updated with priv-15\"). Find the host in inventory 3 whose private_ip_address equals the device IP, and use its inventory hostname as host_name. If none or several match, stop. Never use the IP or a guessed name. Never invent values.\n\n6. CHECK MODE: Launch the template ONCE with job_type \"check\" and extra_vars {\"host_name\": \"<inventory hostname>\", \"rogue_user\": \"<username>\"}. Do NOT poll the job. Report the job ID and stop.\n\n# Hard rules\n- NEVER launch with job_type \"run\". One launch only.\n- Never create or update the template before the sync status is \"successful\".\n- Never pass variables that are not in the survey.\n- Never make more than 22 tool calls in total. Do not retry a failed call more than once.\n\n# Output\nRespond ONLY with this valid JSON, no markdown or extra text:\n{\"result\":{\"content\":{\"success\":\"true or false as a string\",\"failed_step\":\"step name or empty string\",\"job_template\":\"name or empty string\",\"host_name\":\"inventory hostname or empty string\",\"job_id\":\"id or empty string\",\"message\":\"short result or exact error text\"}}}\nBoolean-like values must be the strings \"true\" or \"false\", never JSON booleans.",
+        "llm_model_id": "7df9cb57-b161-4c33-ad5a-c28ba5e56c21",
+        "credential_id": "5857020d-da46-4c19-ad3a-6a811a3a2388",
+        "tool_selections": [
+          "0982d88c-afc2-49c1-92db-4866c30a1598",
+          "528a12cf-d72d-4e9f-88e7-d9e86b8e9ba4"
+        ],
+        "integration_connections": [
+          {
+            "credential_id": "68f2d7d2-fe6b-4f57-813a-6b2eb12a1d38",
+            "integration_id": "02b72616-c6bc-4f2a-9acd-52b0d931f72a"
+          }
+        ],
+        "tool_selection_strategy": "SELECTED"
+      }
+    },
+    {
+      "id": "activity_d81d8af1_4b3f_4781_bff9_e6bfc8b58457",
+      "name": "Task Agent",
+      "type": "agentic",
+      "position": {
+        "x": 1655.7809579861787,
+        "y": -332.9072341487579
+      },
+      "settings": {},
+      "parameters": {
+        "prompt": "Hello owrld",
+        "llm_model_id": "7df9cb57-b161-4c33-ad5a-c28ba5e56c21",
+        "credential_id": "5857020d-da46-4c19-ad3a-6a811a3a2388",
+        "tool_selections": [
+          "0982d88c-afc2-49c1-92db-4866c30a1598",
+          "528a12cf-d72d-4e9f-88e7-d9e86b8e9ba4"
+        ],
+        "integration_connections": [
+          {
+            "credential_id": "68f2d7d2-fe6b-4f57-813a-6b2eb12a1d38",
+            "integration_id": "02b72616-c6bc-4f2a-9acd-52b0d931f72a"
+          }
+        ],
+        "tool_selection_strategy": "SELECTED"
+      }
+    },
+    {
+      "id": "activity_ea127657_6706_45ab_a8bc_9f43b6207057",
+      "name": "Approve Fix Automation Execution",
+      "type": "approval",
+      "position": {
+        "x": 1336.0591108873975,
+        "y": -137.56089010400962
+      },
+      "settings": {},
+      "parameters": {
+        "prompt": "Approve Fix Automation Execution",
+        "approver_users": [
+          "admin"
+        ],
+        "fallback_decision": "reject"
+      }
+    },
+    {
+      "id": "activity_f77d0a3b_020d_4538_9f79_0d544e689a10",
+      "name": "Send Slack Message",
+      "type": "agentic",
+      "position": {
+        "x": -193.1678749277607,
+        "y": -589.3038507880057
+      },
+      "settings": {},
+      "parameters": {
+        "prompt": "You are a notification component. Send a Slack notification for the Cisco alert below by launching an AAP Job Template through the Ansible MCP (use \"discover\" with the job_management toolset only; do not open any other toolset).\n\n<log>\n${trigger}\n</log>\n\nSteps:\n1. Write a plain-text message of at most 6 lines: \"[SEVERITY] <device IP> - <event name>\", a one-sentence explanation, and the key details from the log (interface, source IP, neighbor). Use only facts from the log. Replace any password or secret with ***.\n2. Find the Job Template to Notify Slack and launch it once with extra_vars {\"slack_message\": \"<message>\"} (valid JSON, line breaks as \\n). Do not pass any other variable, especially not the token, which has a default.\n3. Do not create or change anything else. If the template is missing or the launch fails, do not retry; report the failure.\n\nRespond ONLY with this JSON, no markdown or extra text:\n{\"result\":{\"content\":{\"notified\":\"true or false as a string\",\"message\":\"short result or failure reason\"}}}",
+        "llm_model_id": "7df9cb57-b161-4c33-ad5a-c28ba5e56c21",
+        "credential_id": "5857020d-da46-4c19-ad3a-6a811a3a2388",
+        "tool_selections": [
+          "0982d88c-afc2-49c1-92db-4866c30a1598",
+          "528a12cf-d72d-4e9f-88e7-d9e86b8e9ba4",
+          "6fe46bbe-ad29-44b9-a11c-7fb06a658281",
+          "cb52ed73-ad54-4e82-8398-412427122f76",
+          "3a49fca6-987c-4191-bcf1-2d1a487bd49a",
+          "a542eb80-bf39-49f2-9e44-84152e3f8eae",
+          "00e3aaf3-4981-40ac-9e0c-4e4fd264d442",
+          "659948f7-e560-429d-bdbb-f3454edd6446",
+          "8a44c95c-e56e-46f6-986f-c65dccfd01b7",
+          "600133e4-e90c-498a-8bdd-a65b07d5092f",
+          "6486e5b2-7a1b-43c8-b915-f4f7c04358e0",
+          "cfec0394-1af1-46a8-8675-83ddbde81f0d",
+          "0bc936bd-5958-4ae6-9576-26f84455f152",
+          "f1a8b217-b6e1-460c-b5e7-009cf68fed97",
+          "78d56c1b-4a8a-4108-a8ce-5160be362390",
+          "d642cd69-10fe-41af-8b2a-aa881a3e0b13",
+          "34931270-cd7b-4ad4-8eeb-b815c8a793af",
+          "aa4963c5-49d2-4a06-9e62-25c2f44ffe39",
+          "9765a0cd-ee81-4bc6-83c6-0f42e6a271ef",
+          "e5fd271a-2875-4ee3-88c6-b2c3cf26a8c0",
+          "f008caad-0b54-4c37-9ec7-4376d3dc5530",
+          "4cbc570a-2ae7-4386-b54a-0a506a68554a",
+          "374c4031-128d-4678-b6f8-52560690e9d1",
+          "b5631213-3ba6-45d0-bdbb-2c429205dd37",
+          "778de82f-6e16-4632-a821-7940301512af",
+          "369dd96e-707b-4a49-b66b-b00db8b9cf16",
+          "1371a498-de42-4bd1-ac1e-2a74a95b8ad7",
+          "bc097466-fa0e-40f0-a8a9-e497601e4973",
+          "f085dade-1e24-49f3-b6ce-e768a0e176fb",
+          "a7df14af-3da3-4a63-ba3c-8c47bba0c177",
+          "2161f820-b4d1-498b-b87d-b7d8cad6e725",
+          "efa6a26b-2865-4974-8aa3-b2c5f707639a",
+          "92493835-da9d-472e-973d-d4be92273940",
+          "85f1d458-5bb0-4b8e-9e04-e9bc58fdec5c",
+          "1dafc3f3-0efd-4091-a956-2538f4aa83fd",
+          "e9adbe7a-1dc5-4e99-94bb-1bc17085fecf",
+          "4946a594-1c93-4f89-ba55-c91690d2ed6a",
+          "b1db63de-a8b5-4d27-8156-9c8fec0e3da1",
+          "9b505e65-4094-41da-8c15-c0e514ce8bec",
+          "57cbb480-222f-444a-90c3-f441aa10bb8b",
+          "ac46a504-b893-465a-83c4-eb2290795eef",
+          "58056b01-816a-4883-bce0-fd0ade3cfd8e",
+          "61b00e94-7d88-424c-bf60-d43be2d6404a",
+          "cde54c89-21eb-4bec-833b-0b62da7fb0af",
+          "eeb1b4e6-8abe-4b2e-9ea6-3f042dbefccd",
+          "966a0e7f-c992-4490-a222-d939fa49c43c",
+          "50c22263-bb6f-48c2-a500-4f734de4f956",
+          "785adb1f-9669-4761-82b2-0f70b46240e3"
+        ],
+        "integration_connections": [
+          {
+            "credential_id": "68f2d7d2-fe6b-4f57-813a-6b2eb12a1d38",
+            "integration_id": "02b72616-c6bc-4f2a-9acd-52b0d931f72a"
+          },
+          {
+            "credential_id": "1986b2b1-efbd-464d-af0d-5a16b27eb8e6",
+            "integration_id": "7d0b58e5-0b39-4f93-877e-248350027785"
+          }
+        ],
+        "tool_selection_strategy": "SELECTED"
+      }
+    },
+    {
+      "id": "activity_7b92638d_5937_4a9a_9f3b_24d547cec6b6",
+      "name": "Run Available Automation (MCP Server)",
+      "type": "agentic",
+      "position": {
+        "x": 228.48060451078248,
+        "y": -589.5328566292195
+      },
+      "settings": {},
+      "parameters": {
+        "prompt": "You are a network operations executor component. You receive an alert/log from a Cisco device, identify the problem, and remediate it by running the matching Ansible Job Template through the Ansible MCP server.\n\n# Input\n<log>\n${trigger}\n</log>\n\n# Procedure (follow in this exact order)\n1. ANALYZE: Read the log and identify the problem, the device's private IP address (private_ip_address), and any other relevant details (e.g., interface name).\n2. FIND TEMPLATE: Use the Ansible MCP server to list the Job Templates and select the one designed to fix this specific problem. If none clearly matches, do not run anything (see Failure handling).\n3. READ THE SURVEY: Retrieve the selected template's survey spec. Note the exact variable names (e.g., host_name, interface_name) and which are required.\n4. RESOLVE THE HOST: Use the Ansible MCP server to search the Inventory for the host whose private_ip_address equals the IP found in the log. Take that inventory entry's hostname. This is the value for host_name.\n   - NEVER use the IP address, the hostname shown in the log, or a guessed name as host_name. Only the inventory hostname is valid.\n5. BUILD extra_vars: Use only the variable names defined in the survey. Fill host_name from step 4 and the other values from the log. Do not invent values or add variables that are not in the survey.\n6. RUN: Launch the Job Template once with those extra_vars. Do not launch it more than once.\n7. CHECK: Retrieve the job status and report it.\n\n# Failure handling (do NOT run any Job Template in these cases)\n- No template matches the problem.\n- No inventory host has the private IP from the log, or more than one does.\n- A required survey variable cannot be determined from the log or inventory.\n- An MCP call fails.\nIn these cases, stop and report the reason in the output.\n\n# Output rules (strict)\n- Respond with ONLY a valid JSON object. No markdown, no code fences, no text before or after.\n- Use exactly this structure:\n{\"result\":{\"content\":{\"executed\":\"true or false as a string\",\"job_template\":\"name or empty string\",\"host_name\":\"inventory hostname or empty string\",\"extra_vars\":{},\"job_status\":\"status or empty string\",\"message\":\"short explanation\"}}}\n- \"executed\" must be the string \"true\" or \"false\", never a boolean.\n",
+        "llm_model_id": "7df9cb57-b161-4c33-ad5a-c28ba5e56c21",
+        "credential_id": "5857020d-da46-4c19-ad3a-6a811a3a2388",
+        "tool_selections": [
+          "528a12cf-d72d-4e9f-88e7-d9e86b8e9ba4",
+          "0982d88c-afc2-49c1-92db-4866c30a1598"
+        ],
+        "integration_connections": [
+          {
+            "credential_id": "68f2d7d2-fe6b-4f57-813a-6b2eb12a1d38",
+            "integration_id": "02b72616-c6bc-4f2a-9acd-52b0d931f72a"
+          }
+        ],
+        "tool_selection_strategy": "SELECTED"
+      }
+    },
+    {
+      "id": "logic_1793115598126_hvz4it1ifm8k7",
+      "name": "Is there available any Job Template to fix the issue?",
+      "type": "switch",
+      "position": {
+        "x": -593.2378713317985,
+        "y": -385.0081969035663
+      },
+      "parameters": {
+        "cases": [
+          {
+            "port": "case_0",
+            "label": "FIX AVAILABLE",
+            "condition": "${activity_ceeb9d64_4405_4c00_adc1_71c12865f7c4.result.content.fix_available} == 'true'"
+          },
+          {
+            "port": "case_1",
+            "label": "FIX NOT AVAILABLE",
+            "condition": "${activity_ceeb9d64_4405_4c00_adc1_71c12865f7c4.result.content.fix_available} == 'false'"
+          }
+        ],
+        "default_port": "default"
+      }
+    }
+  ],
+  "triggers": [
+    {
+      "id": "activity_2f76a2b9_110c_444c_bab0_f8793eb7d364",
+      "name": "Trigger: Splunk Cisco",
+      "type": "eda_trigger",
+      "position": {
+        "x": -1338,
+        "y": -305
+      },
+      "parameters": {
+        "webhook_path": "cisco_splunk",
+        "authorized_service_account_ids": [
+          "bda0fa5e-9f67-4c53-a709-fd48d054e621"
+        ]
+      }
+    }
+  ],
+  "description": "New workflow",
+  "schema_version": "2.0.0"
+}
