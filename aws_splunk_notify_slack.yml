@@ -12,5 +12,4 @@
         token: "{{ slack_token }}"
         channel: "#ansible-demos"
         username: "Ansible Demos"
-        #msg: "Potential Log In Authentication Attack {{ ansible_eda }}"
-        msg: "Potential Log In Authentication Attack"
+        msg: "{{ slack_message }}"
