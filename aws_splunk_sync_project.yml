@@ -1,0 +1,21 @@
+---
+
+- name: AWS Splunk AO Sync Remediation Project
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  vars:
+    aap_hostname: "https://{{ aap_fqdn }}"
+    aap_validate_certs: true
+    aap_username: admin
+    aap_password: "{{ admin_password }}"
+    controller_projects:
+      - name: "AWS Splunk AO Remediation Project"
+        description: "AWS Splunk AO Remediation Project"
+        organization: "Default"
+        scm_type: git
+        scm_url: "{{ github_url }}"
+        update_project: true
+        wait: true  
+  roles:
+    - {role: infra.aap_configuration.controller_project_update, when: controller_projects is defined}
