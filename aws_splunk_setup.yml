@@ -299,7 +299,7 @@
     ansible_network_os: cisco.ios.ios
     ansible_command_timeout: 300
   tasks:
-    - name: Send syslog to Splunk and Set login block policy
+    - name: Send syslog to Splunk
       cisco.ios.ios_config:
         lines:
           - service timestamps log datetime msec localtime show-timezone
