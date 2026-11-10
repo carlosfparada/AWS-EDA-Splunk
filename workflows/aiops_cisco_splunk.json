@@ -1,67 +1,31 @@
 {
+  "schema_version": "2.0.0",
   "name": "AIOps: Cisco Splunk",
-  "edges": [
+  "description": "New workflow",
+  "triggers": [
     {
-      "to": "logic_1793115598126_hvz4it1ifm8k7",
-      "from": "activity_ceeb9d64_4405_4c00_adc1_71c12865f7c4"
-    },
-    {
-      "to": "activity_ea127657_6706_45ab_a8bc_9f43b6207057",
-      "from": "activity_d68ed903_58da_4568_95ef_454bf7fae9e4"
-    },
-    {
-      "to": "activity_d81d8af1_4b3f_4781_bff9_e6bfc8b58457",
-      "from": "activity_ea127657_6706_45ab_a8bc_9f43b6207057",
-      "from_port": "approved"
-    },
-    {
-      "to": "activity_96169859_8105_40b1_8351_51c05de24b37",
-      "from": "activity_16baf739_39fd_4822_9ccf_6bacb4f2b6c5"
-    },
-    {
-      "to": "activity_d68ed903_58da_4568_95ef_454bf7fae9e4",
-      "from": "activity_96169859_8105_40b1_8351_51c05de24b37"
-    },
-    {
-      "to": "activity_ceeb9d64_4405_4c00_adc1_71c12865f7c4",
-      "from": "activity_876f3816_d07e_449d_b125_0df707d9760a"
-    },
-    {
-      "to": "activity_876f3816_d07e_449d_b125_0df707d9760a",
-      "from": "activity_2f76a2b9_110c_444c_bab0_f8793eb7d364"
-    },
-    {
-      "to": "activity_16baf739_39fd_4822_9ccf_6bacb4f2b6c5",
-      "from": "logic_1793115598126_hvz4it1ifm8k7",
-      "from_port": "case_1"
-    },
-    {
-      "to": "activity_7b92638d_5937_4a9a_9f3b_24d547cec6b6",
-      "from": "logic_1793115598126_hvz4it1ifm8k7",
-      "from_port": "case_0"
-    },
-    {
-      "to": "activity_6fb8f04b_be04_42b1_a754_efae5f3ddffd",
-      "from": "activity_368a3fae_69ae_482e_8853_210a0516548a"
-    },
-    {
-      "to": "activity_368a3fae_69ae_482e_8853_210a0516548a",
-      "from": "activity_ea127657_6706_45ab_a8bc_9f43b6207057",
-      "from_port": "rejected"
+      "id": "activity_2f76a2b9_110c_444c_bab0_f8793eb7d364",
+      "type": "eda_trigger",
+      "name": "Trigger: Splunk Cisco",
+      "parameters": {
+        "webhook_path": "cisco_splunk",
+        "authorized_service_account_ids": [
+          "bda0fa5e-9f67-4c53-a709-fd48d054e621"
+        ]
+      },
+      "position": {
+        "x": -1729.008938962148,
+        "y": -306.2214604962934
+      }
     }
   ],
   "nodes": [
     {
       "id": "activity_16baf739_39fd_4822_9ccf_6bacb4f2b6c5",
-      "name": "Create Fix Automation (Playbook)",
       "type": "agentic",
-      "position": {
-        "x": -227.64810222082886,
-        "y": -199.42004570324195
-      },
-      "settings": {},
+      "name": "Create Fix Automation (Playbook)",
       "parameters": {
-        "prompt": "You are a network automation-builder. You receive a Cisco IOS alert, write an Ansible playbook that fixes it, and commit it to GitHub only if the file does not exist yet. You do not touch AAP.\n\n<log>\n${trigger}\n</log>\n\n# Tools\nUse ONLY the GitHub MCP tools in your tool list. Never call \"discover\". Do not use any other tool.\nRepository: owner \"carlosfparada\", repo \"AWS-AIOps-fixes\", branch \"main\".\n\n# Steps\n1. ANALYZE (no tool call): Read the log and identify:\n   - the event mnemonic (e.g. %AAA-6-USER_PRIVILEGE_UPDATE)\n   - the device IP\n   - every parameter the fix needs (user, interface, source IP, etc.), using only facts in the log\n   If the event is a protection working as designed (e.g. login quiet mode), the log is unclear, or the fix needs a forbidden action, go straight to the output with success \"false\" and message \"no safe automated fix\". Do not call any tool.\n\n2. NAME (no tool call): decide the names now.\n   - slug: take the mnemonic, remove the leading \"%\", lowercase it, and replace \"_\" and any other non-alphanumeric character with \"-\".\n     Example: %AAA-6-USER_PRIVILEGE_UPDATE -> aaa-6-user-privilege-update\n   - file name: \"playbook-\" + slug + \".yml\"\n     Example: playbook-aaa-6-user-privilege-update.yml\n   Remember these exact values. You will use them in the check, the commit and the output.\n\n3. WRITE THE PLAYBOOK (no tool call):\n   - Valid YAML starting with \"---\", one play only.\n   - hosts: \"{{ host_name }}\", connection: ansible.netcommon.network_cli, vars: ansible_network_os: cisco.ios.ios.\n   - VARIABLE NAMES ARE A FIXED CONTRACT. Use exactly these names and no others:\n     * the target device: host_name (used only in \"hosts: {{ host_name }}\")\n     * the username taken from the log: rogue_user\n     Never use alert_username, username, user, target_user or any other name for them. Every assert, task and verification must reference rogue_user, not a synonym.\n   - Use only cisco.ios modules and ansible.builtin.assert/debug.\n   - Never hardcode values from the log, IPs or hostnames.\n   - First task: assert that rogue_user is defined, non-empty, and not protected (admin, ansible, ansible_user).\n   - Change only what the problem requires, idempotently, supporting check mode where possible.\n   - Last tasks: verify the result, with failed_when false and changed_when false on read-only commands.\n   - No passwords, tokens or secrets.\n   - Forbidden: reload, erase, delete, copy to startup-config, management interface, routing, AAA servers, disabling logging or other security protections, any change beyond the single target device.\n\n4. CHECK AND COMMIT (never overwrite):\n   a. Call get_file_contents ONCE for the file name from step 2.\n   b. If the file EXISTS: do NOT commit, do NOT update, do NOT use any sha. Go straight to the output with success \"true\" and message \"File already exists, not overwritten\".\n   c. If the result is 404 or \"not found\": that is expected. Make ONE create call for the file (no sha) with commit message \"Add fix: <short description>\". If it fails, do not retry; go to the output with success \"false\" and the exact error text in \"message\".\n   d. If get_file_contents fails with any other error (401, 403, tool error), do not commit; go to the output with success \"false\" and the exact error text in \"message\".\n   Never make more than 2 tool calls in total.\n\n5. After step 4, do not call any more tools. Do not read the file back or verify. Go directly to the output.\n\n# Output\nRespond ONLY with this valid JSON, no markdown or extra text. Every field must be filled:\n{\"result\":{\"content\":{\"success\":\"true or false as a string\",\"slug\":\"slug from step 2\",\"playbook\":\"exact file name from step 2\",\"device_ip\":\"IP from the log\",\"parameters\":{\"<param_name>\":\"<value from the log>\"},\"message\":\"short result or exact error text\"}}}\n\nRules for the output:\n- \"playbook\" is the exact file name from step 2. It must never be empty when success is \"true\".\n- \"parameters\" lists the variable names the playbook uses (except host_name) with their values from the log.\n- Boolean-like values must be the strings \"true\" or \"false\", never JSON booleans.\n- If success is \"true\" and \"playbook\" would be empty, you made a mistake: fill it with the file name from step 2.",
+        "prompt": "You are a network automation-builder. You receive a Cisco IOS alert, write an Ansible playbook that fixes it, and commit it to GitHub only if the file does not exist yet. You do not touch AAP.\n\n<log>\n${trigger}\n</log>\n\n# Tools\nUse ONLY the GitHub MCP tools in your tool list. Never call \"discover\". Do not use any other tool.\nRepository: owner \"carlosfparada\", repo \"AWS-AIOps-fixes\", branch \"main\".\n\n# Steps\n1. ANALYZE (no tool call): Read the log and identify:\n   - the event mnemonic (e.g. %AAA-6-USER_PRIVILEGE_UPDATE)\n   - the device IP\n   - every parameter the fix needs (user, interface, source IP, etc.), using only facts in the log\n   If the event is a protection working as designed (e.g. login quiet mode), the log is unclear, or the fix needs a forbidden action, go straight to the output with success \"false\" and message \"no safe automated fix\". Do not call any tool.\n\n2. NAME (no tool call): decide the names now.\n   - slug: take the mnemonic, remove the leading \"%\", lowercase it, and replace \"_\" and any other non-alphanumeric character with \"-\".\n     Example: %AAA-6-USER_PRIVILEGE_UPDATE -> aaa-6-user-privilege-update\n   - file name: \"playbook-\" + slug + \".yml\"\n     Example: playbook-aaa-6-user-privilege-update.yml\n   Remember these exact values. You will use them in the check, the commit and the output.\n\n3. WRITE THE PLAYBOOK (no tool call):\n   - Valid YAML starting with \"---\", one play only.\n   - hosts: \"{{ host_name }}\", connection: ansible.netcommon.network_cli, vars: ansible_network_os: cisco.ios.ios.\n   - VARIABLE NAMES ARE A FIXED CONTRACT. Use exactly these names and no others:\n     * the target device: host_name (used only in \"hosts: {{ host_name }}\")\n     * the username taken from the log: backdoor user\n     Never use alert_username, username, user, target_user or any other name for them. Every assert, task and verification must reference rogue_user, not a synonym.\n   - Use only cisco.ios modules and ansible.builtin.assert/debug.\n   - Never hardcode values from the log, IPs or hostnames.\n   - First task: assert that rogue_user is defined, non-empty, and not protected (admin, ansible, ansible_user).\n   - Change only what the problem requires, e.g. make sure new users cannot be created and must be deleted..\n   - Last tasks: verify the result, with failed_when false and changed_when false on read-only commands.\n   - No passwords, tokens or secrets.\n   - Forbidden: reload, erase, delete, copy to startup-config, management interface, routing, AAA servers, disabling logging or other security protections, any change beyond the single target device.\n\n4. CHECK AND COMMIT (never overwrite):\n   a. Call get_file_contents ONCE for the file name from step 2.\n   b. If the file EXISTS: do NOT commit, do NOT update, do NOT use any sha. Go straight to the output with success \"true\" and message \"File already exists, not overwritten\".\n   c. If the result is 404 or \"not found\": that is expected. Make ONE create call for the file (no sha) with commit message \"Add fix: <short description>\". If it fails, do not retry; go to the output with success \"false\" and the exact error text in \"message\".\n   d. If get_file_contents fails with any other error (401, 403, tool error), do not commit; go to the output with success \"false\" and the exact error text in \"message\".\n   Never make more than 2 tool calls in total.\n\n5. After step 4, do not call any more tools. Do not read the file back or verify. Go directly to the output.\n\n# Output\nRespond ONLY with this valid JSON, no markdown or extra text. Every field must be filled:\n{\"result\":{\"content\":{\"success\":\"true or false as a string\",\"slug\":\"slug from step 2\",\"playbook\":\"exact file name from step 2\",\"device_ip\":\"IP from the log\",\"parameters\":{\"<param_name>\":\"<value from the log>\"},\"message\":\"short result or exact error text\"}}}\n\nRules for the output:\n- \"playbook\" is the exact file name from step 2. It must never be empty when success is \"true\".\n- \"parameters\" lists the variable names the playbook uses (except host_name) with their values from the log.\n- Boolean-like values must be the strings \"true\" or \"false\", never JSON booleans.\n- If success is \"true\" and \"playbook\" would be empty, you made a mistake: fill it with the file name from step 2.\n",
         "llm_model_id": "7df9cb57-b161-4c33-ad5a-c28ba5e56c21",
         "credential_id": "5857020d-da46-4c19-ad3a-6a811a3a2388",
         "tool_selections": [
@@ -123,17 +87,17 @@
           }
         ],
         "tool_selection_strategy": "SELECTED"
+      },
+      "settings": {},
+      "position": {
+        "x": -227.64810222082886,
+        "y": -199.42004570324195
       }
     },
     {
       "id": "activity_368a3fae_69ae_482e_8853_210a0516548a",
-      "name": "Remove Job Template",
       "type": "agentic",
-      "position": {
-        "x": 1286.8661070770438,
-        "y": 44.577421162193794
-      },
-      "settings": {},
+      "name": "Remove Job Template",
       "parameters": {
         "prompt": "You are a cleanup component. Delete one AAP Job Template using the Ansible MCP. Delete nothing else.\n\n<log>\n${trigger}\n</log>\n\n# Tools\nUse only the Ansible MCP through \"discover\". Open only job_management, once. Do not open any other toolset. Call only tools whose exact names appeared in the discover output. Never guess a tool name.\n\n# Names (decide first, no tool call)\n- Take the event mnemonic from the log (e.g. %AAA-6-USER_PRIVILEGE_UPDATE).\n- slug: remove the leading \"%\", lowercase it, and replace \"_\" and any other non-alphanumeric character with \"-\".\n  Example: %AAA-6-USER_PRIVILEGE_UPDATE -> aaa-6-user-privilege-update\n- template name: \"AWS Splunk: Fix \" + slug\n  Example: AWS Splunk: Fix aaa-6-user-privilege-update\nIf the log has no mnemonic, stop with success \"false\" and message \"no mnemonic in log\". Do not call any tool.\n\n# Steps\n1. Look up the Job Template by searching for the template name. From the results, keep only those whose name matches the template name exactly.\n   - If none match, report \"not found\" and stop (not an error).\n   - If more than one matches, delete nothing and report \"multiple found\".\n2. If exactly one matches, find the delete tool: it is the tool in the discover output whose name contains \"job_templates\" and \"delete\" (for example job_templates_destroy or job_templates_delete). Call it ONCE with the ID returned by the lookup. Use the exact parameter names from that tool's schema.\n3. If no such delete tool exists, do not try anything else. Report \"no delete tool available\" and list the names of the job template tools you saw.\n4. If any call fails, do not retry. Copy the tool name and the exact error text into \"template\".\n5. Never make more than 6 tool calls in total. After the delete call, stop. Do not verify.\n\n# Output\nRespond ONLY with this JSON, no markdown or extra text:\n{\"result\":{\"content\":{\"success\":\"true or false as a string\",\"template\":\"deleted <template name>, not found, multiple found, no delete tool (tools: ...), or tool name and exact error text\"}}}\n\"success\" is \"true\" only if the result is deleted or not found.",
         "llm_model_id": "7df9cb57-b161-4c33-ad5a-c28ba5e56c21",
@@ -153,17 +117,17 @@
           }
         ],
         "tool_selection_strategy": "SELECTED"
+      },
+      "settings": {},
+      "position": {
+        "x": 1286.8661070770438,
+        "y": 44.577421162193794
       }
     },
     {
       "id": "activity_6fb8f04b_be04_42b1_a754_efae5f3ddffd",
-      "name": "Remove Playbook",
       "type": "agentic",
-      "position": {
-        "x": 1717.0096679046194,
-        "y": 44.42360385309431
-      },
-      "settings": {},
+      "name": "Remove Playbook",
       "parameters": {
         "prompt": "You are an cleanup component. Delete one playbook file from GitHub. Delete nothing else.\n\n<log>\n${trigger}\n</log>\n\n# Tools\nUse only the GitHub MCP tools in your tool list. Never call \"discover\".\nRepository: owner \"carlosfparada\", repo \"AWS-AIOps-fixes\", branch \"main\".\n\n# Names (decide first, no tool call)\n- Take the event mnemonic from the log (e.g. %AAA-6-USER_PRIVILEGE_UPDATE).\n- slug: remove the leading \"%\", lowercase it, and replace \"_\" and any other non-alphanumeric character with \"-\".\n  Example: %AAA-6-USER_PRIVILEGE_UPDATE -> aaa-6-user-privilege-update\n- file path: \"playbook-\" + slug + \".yml\"\nIf the log has no mnemonic, stop with success \"false\" and message \"no mnemonic in log\". Do not call any tool.\n\n# Steps\n1. Call get_file_contents ONCE for the file path. If it returns 404 or \"not found\", report \"not found\" and stop (not an error). Take the file's \"sha\" from the result.\n2. Find the delete tool: it is the tool in your list whose name contains \"delete\" (for example delete_file). Call it ONCE with owner, repo, path, branch, sha and the commit message \"Rejected fix: <slug>\". Use the exact parameter names from that tool's schema.\n3. If no tool with \"delete\" in its name exists, do not try anything else. Report \"no delete tool available\" and list the names of the GitHub tools you have.\n4. If any call fails, do not retry. Copy the tool name and the exact error text into \"playbook\".\n5. Never make more than 3 tool calls in total. After the delete call, stop. Do not read the file back.\n\n# Output\nRespond ONLY with this JSON, no markdown or extra text:\n{\"result\":{\"content\":{\"success\":\"true or false as a string\",\"playbook\":\"updated <file path>, not found, no delete tool (tools: ...), or tool name and exact error text\"}}}\n\"success\" is \"true\" only if the result is deleted or not found.",
         "llm_model_id": "7df9cb57-b161-4c33-ad5a-c28ba5e56c21",
@@ -227,17 +191,17 @@
           }
         ],
         "tool_selection_strategy": "SELECTED"
+      },
+      "settings": {},
+      "position": {
+        "x": 1717.0096679046194,
+        "y": 44.42360385309431
       }
     },
     {
       "id": "activity_7b92638d_5937_4a9a_9f3b_24d547cec6b6",
-      "name": "Run Available Automation (MCP Server)",
       "type": "agentic",
-      "position": {
-        "x": -228.73349361980482,
-        "y": -575.6310766184922
-      },
-      "settings": {},
+      "name": "Run Available Automation (MCP Server)",
       "parameters": {
         "prompt": "You are a network operations executor component. You receive an alert/log from a Cisco device, identify the problem, and remediate it by running the matching Ansible Job Template through the Ansible MCP server.\n\n# Input\n<log>\n${trigger}\n</log>\n\n# Procedure (follow in this exact order)\n1. ANALYZE: Read the log and identify the problem, the device's private IP address (private_ip_address), and any other relevant details (e.g., interface name).\n\n2. FIND TEMPLATE: Use the Ansible MCP server to list the Job Templates and select the one designed to fix this specific problem. If none clearly matches, do not run anything (see Failure handling).\n\n3. READ THE SURVEY: Retrieve the selected template's survey spec. Note the exact variable names (e.g., host_name, interface_name) and which are required.\n\n4. RESOLVE THE HOST: Use the Ansible MCP server to search the Inventory for the host whose private_ip_address equals the IP found in the log. Take that inventory entry's hostname. This is the value for host_name.\n   - NEVER use the IP address, the hostname shown in the log, or a guessed name as host_name. Only the inventory hostname is valid.\n\n5. BUILD extra_vars: Use only the variable names defined in the survey. Fill host_name from step 4 and the other values from the log. Do not invent values or add variables that are not in the survey.\n\n6. RUN: Launch the Job Template once with those extra_vars. Playbook run not check mode. Do not launch it more than once.\n\n7. CHECK: Retrieve the job status and report it.\n\n# Failure handling (do NOT run any Job Template in these cases)\n- No template matches the problem.\n- No inventory host has the private IP from the log, or more than one does.\n- A required survey variable cannot be determined from the log or inventory.\n- An MCP call fails.\nIn these cases, stop and report the reason in the output.\n\n# Output rules (strict)\n- Respond with ONLY a valid JSON object. No markdown, no code fences, no text before or after.\n- Use exactly this structure:\n{\"result\":{\"content\":{\"executed\":\"true or false as a string\",\"job_template\":\"name or empty string\",\"host_name\":\"inventory hostname or empty string\",\"extra_vars\":{},\"job_status\":\"status or empty string\",\"message\":\"short explanation\"}}}\n- \"executed\" must be the string \"true\" or \"false\", never a boolean.\n",
         "llm_model_id": "7df9cb57-b161-4c33-ad5a-c28ba5e56c21",
@@ -253,17 +217,17 @@
           }
         ],
         "tool_selection_strategy": "SELECTED"
+      },
+      "settings": {},
+      "position": {
+        "x": -228.73349361980482,
+        "y": -575.6310766184922
       }
     },
     {
       "id": "activity_876f3816_d07e_449d_b125_0df707d9760a",
-      "name": "Send Slack Message",
       "type": "agentic",
-      "position": {
-        "x": -1436.1666201701896,
-        "y": -405.29055883145395
-      },
-      "settings": {},
+      "name": "Send Slack Message",
       "parameters": {
         "prompt": "You are a notification component. Send a Slack notification for the Cisco alert below by launching an AAP Job Template through the Ansible MCP (use \"discover\" with the job_management toolset only; do not open any other toolset).\n\n<log>\n${trigger}\n</log>\n\nSteps:\n1. Write a plain-text message of at most 6 lines: \"[SEVERITY] <device IP> - <event name>\", a one-sentence explanation, and the key details from the log (interface, source IP, neighbor). Use only facts from the log. Replace any password or secret with ***.\n2. Find the Job Template to Notify Slack and launch it once with extra_vars {\"slack_message\": \"<message>\"} (valid JSON, line breaks as \\n). Do not pass any other variable, especially not the token, which has a default.\n3. Do not create or change anything else. If the template is missing or the launch fails, do not retry; report the failure.\n\nRespond ONLY with this JSON, no markdown or extra text:\n{\"result\":{\"content\":{\"notified\":\"true or false as a string\",\"message\":\"short result or failure reason\"}}}",
         "llm_model_id": "7df9cb57-b161-4c33-ad5a-c28ba5e56c21",
@@ -283,16 +247,17 @@
           }
         ],
         "tool_selection_strategy": "SELECTED"
+      },
+      "settings": {},
+      "position": {
+        "x": -1436.1666201701896,
+        "y": -405.29055883145395
       }
     },
     {
       "id": "activity_96169859_8105_40b1_8351_51c05de24b37",
-      "name": "Sync Project",
       "type": "aap_job_template",
-      "position": {
-        "x": 219.41703159573933,
-        "y": -152.47885120857032
-      },
+      "name": "Sync Project",
       "parameters": {
         "diff_mode": false,
         "credential_id": "9f779d41-702d-4bb6-9fcd-5623833db808",
@@ -300,17 +265,16 @@
         "job_template_id": 99,
         "job_template_name": "AWS Splunk: Sync Project",
         "organization_name": "Default"
+      },
+      "position": {
+        "x": 219.41703159573933,
+        "y": -152.47885120857032
       }
     },
     {
       "id": "activity_ceeb9d64_4405_4c00_adc1_71c12865f7c4",
-      "name": "Network Operations Triage",
       "type": "agentic",
-      "position": {
-        "x": -1006.4620634091818,
-        "y": -405.09832797624676
-      },
-      "settings": {},
+      "name": "Network Operations Triage",
       "parameters": {
         "prompt": "You are a network operations triage component. You receive an alert/log from a Cisco device and determine whether an Ansible Job Template exists that can fix the problem.\n\n# Input\n<log>\n${trigger}\n</log>\n\n# Procedure\n1. You MUST call the Ansible MCP tool that lists Job Templates before answering. Never answer without calling it. If the result is paginated or truncated, fetch all pages.\n2. Read the log and identify the problem, then translate it into the remediation action that would fix it. Examples:\n   - interface down / link down / administratively down -> enable interface, no shutdown, bring up, bounce/reset interface\n   - BGP neighbor down -> restart/clear BGP session\n   - high CPU -> clear processes, restart service\n3. Compare that remediation action against the name AND description of EVERY Job Template. Match by meaning, not exact wording. A template whose purpose is to perform the remediation action counts as a fix, even if its name does not repeat the words in the log.\n   Example: log says \"Interface GigabitEthernet0/1 changed state to down\" and a template is named \"Enable Interface\" -> fix_available is \"true\".\n4. Set fix_available to \"true\" if at least one template performs the remediation action for this problem, even if it is not a perfect match.\n5. Set fix_available to \"false\" only if you called the tool, reviewed all templates, and none of them performs a relevant remediation.\n6. Do NOT launch or run any Job Template.\n\n# Output rules (strict)\n- Respond with ONLY the JSON object. No explanations, no markdown, no code fences, no text before or after.\n- \"fix_available\" must be the JSON string \"true\" or \"false\" (lowercase, in double quotes). Never a boolean.\n- Do not add, remove, or rename any keys.\n\n{\"result\":{\"content\":{\"fix_available\":\"true\"}}}\nor\n{\"result\":{\"content\":{\"fix_available\":\"false\"}}}\n",
         "llm_model_id": "7df9cb57-b161-4c33-ad5a-c28ba5e56c21",
@@ -340,19 +304,19 @@
           }
         ],
         "tool_selection_strategy": "SELECTED"
+      },
+      "settings": {},
+      "position": {
+        "x": -1006.4620634091818,
+        "y": -405.09832797624676
       }
     },
     {
       "id": "activity_d68ed903_58da_4568_95ef_454bf7fae9e4",
-      "name": "Create Artifacts (Job Template) + Check Mode",
       "type": "agentic",
-      "position": {
-        "x": 529.3299179383387,
-        "y": -209.9273783008521
-      },
-      "settings": {},
+      "name": "Create Artifacts (Job Template)",
       "parameters": {
-        "prompt": "You are a network automation executor. You create or overwrite an AAP Job Template for an existing playbook and validate it in CHECK MODE ONLY, using the Ansible MCP. You do not touch GitHub. The project has already been synced by a previous step, so you never sync it.\n\n<log>\n${trigger}\n</log>\n\n# Tools\nUse only the Ansible MCP through \"discover\". Open only job_management and inventory_management, once each. Do not open any other toolset. Do not search jobs or list unrelated objects. Call only tools whose exact names appeared in the discover output. Never guess a tool name.\n\n# Fixed values (use these numbers, do not search for them)\n- Project ID: 63 (\"AWS Splunk AO Remediation Project\")\n- Inventory ID: 3 (\"AWS Inventory\")\n- Credential ID: 7 (\"AWS Splunk Credential\")\n- Playbook: playbook-aaa-6-user-privilege-update.yml\n- Template name: \"AWS Splunk: Fix aaa-6-user-privilege-update\"\n- Survey variables: host_name, rogue_user\n\n# Steps (stop at the first failure and report the exact error)\n0. If the log does not contain \"%AAA-6-USER_PRIVILEGE_UPDATE\", stop with \"unsupported event\".\n\n1. PLAYBOOK CHECK: List the playbooks of project 63. If playbook-aaa-6-user-privilege-update.yml is not in the list, stop and report the list you saw. Do not try to sync the project.\n\n2. FIND: Look up the Job Template named \"AWS Splunk: Fix aaa-6-user-privilege-update\". Remember its ID if it exists.\n\n3. CREATE OR OVERWRITE:\n   - If it does not exist, create it. If it exists, update it (same ID). Never create a second template with the same name.\n   - Set exactly these values in both cases: name \"AWS Splunk: Fix aaa-6-user-privilege-update\", project 63, playbook \"playbook-aaa-6-user-privilege-update.yml\", inventory 3, job_type \"check\", survey_enabled true.\n   a. Create or update the template with the values above.\n   b. Make sure credential 7 is attached (add it if missing; do not add it twice).\n   c. Set the survey spec (separate call, replaces any existing survey): two required text questions, named exactly host_name and rogue_user.\n\n4. HOST LOOKUP: From the log, extract the device IP and rogue_user. Find the inventory named \"AWS Inventory\", then list ALL of its hosts (use page_size 100). Do not use the \"search\" parameter and do not filter by private_ip_address. For each host, read its \"variables\" field and look for \"private_ip_address\" equal to the device IP. Use the host's \"name\" as host_name. If exactly one host matches, continue. If none or several match, stop and put the names of the hosts you saw in \"message\".\n\n5. CHECK MODE: Launch the template ONCE with job_type \"check\" and extra_vars {\"host_name\": \"<inventory hostname>\", \"rogue_user\": \"<username>\"}. Do NOT poll the job. Report the job ID and stop.\n\n# Hard rules\n- NEVER launch with job_type \"run\". One launch only.\n- Never sync or update the project.\n- Never pass variables that are not in the survey.\n- Never make more than 16 tool calls in total. Do not retry a failed call more than once.\n\n# Output\nRespond ONLY with this valid JSON, no markdown or extra text:\n{\"result\":{\"content\":{\"success\":\"true or false as a string\",\"failed_step\":\"step name or empty string\",\"job_template\":\"name or empty string\",\"host_name\":\"inventory hostname or empty string\",\"job_id\":\"id or empty string\",\"message\":\"short result or exact error text\"}}}\nBoolean-like values must be the strings \"true\" or \"false\", never JSON booleans.",
+        "prompt": "You are a network automation executor. You create or overwrite an AAP Job Template for an existing playbook and run it, using the Ansible MCP. You do not touch GitHub. The project has already been synced by a previous step, so you never sync it.\n\n<log>\n${trigger}\n</log>\n\n# Tools\nUse only the Ansible MCP through \"discover\". Open job_management and inventory_management in the SAME turn, once each. Do not open any other toolset. Do not search jobs or list unrelated objects. Call only tools whose exact names appeared in the discover output. Never guess a tool name.\n\n# Efficiency rule (important)\nYou have a very small step budget. Whenever calls are independent, make them ALL in the same turn (parallel tool calls). Never make one call per turn when several can be made together.\n\n# Fixed values (refer to objects by these names)\n- Execution Environment: \"EE 2.7 RHEL9 Custom\"\n- Project: \"AWS Splunk AO Remediation Project\"\n- Inventory: \"AWS Inventory\"\n- Credential: \"AWS Splunk Credential\"\n- Playbook: playbook-aaa-6-user-privilege-update.yml\n- Template name: \"AWS Splunk: Fix aaa-6-user-privilege-update\"\n- Survey variables: host_name, rogue_user\n- Protected users (never remove): admin, ansible, ec2-user\n\n# Plan (follow these turns; stop at the first failure and report the exact error)\nTurn 0 (no tool): If the log does not contain \"%AAA-6-USER_PRIVILEGE_UPDATE\", stop with \"unsupported event\". Extract the device IP and rogue_user (pattern \"username: <name> privilege updated with priv-15\"). If rogue_user is a protected user, stop with \"manual review required\". Never invent values.\n\nTurn 1: discover job_management and inventory_management together.\n\nTurn 2 (all together): look up by exact name the Job Template, the project, the inventory, the credential and the execution environment, and list the hosts of \"AWS Inventory\" (page_size 100, filter by inventory name if the tool allows; do not use \"search\"). Keep only exact-name matches. Use the returned IDs only internally.\n\nTurn 3: create the template if it does not exist, or update it (same ID) if it does. Send explicitly: name, project, playbook, inventory, execution_environment, job_type \"run\", survey_enabled true. Never use job_type \"check\". While doing this, also work out the host: read each host's \"variables\" field, find \"private_ip_address\" equal to the device IP, and use the host's \"name\" as host_name. If none or several match, stop with failed_step \"HOST LOOKUP\" and put the host names and IPs you saw in \"message\".\n\nTurn 4 (together): attach the credential to the template, and set the survey spec (replaces any existing one): two required text questions named exactly host_name and rogue_user.\n\nTurn 5: launch the template ONCE with job_type \"run\" and extra_vars {\"host_name\": \"<host name>\", \"rogue_user\": \"<username>\"}.\n\nTurn 6: check the job status at most 2 times. Report the last status and the job_type of the job.\n\n# Hard rules\n- Launch only this template, only once. Never launch any other template.\n- Never pass variables that are not in the survey.\n- Never remove a protected user.\n- Never sync or update the project.\n- Do not retry a failed call more than once.\n\n# Output\nRespond ONLY with this valid JSON, no markdown or extra text:\n{\"result\":{\"content\":{\"success\":\"true or false as a string\",\"failed_step\":\"step name or empty string\",\"job_template\":\"name or empty string\",\"host_name\":\"inventory hostname or empty string\",\"job_id\":\"id or empty string\",\"job_type\":\"job type of the launched job or empty string\",\"job_status\":\"status or empty string\",\"message\":\"short result or exact error text\"}}}\nBoolean-like values must be the strings \"true\" or \"false\", never JSON booleans.",
         "llm_model_id": "7df9cb57-b161-4c33-ad5a-c28ba5e56c21",
         "credential_id": "5857020d-da46-4c19-ad3a-6a811a3a2388",
         "tool_selections": [
@@ -366,17 +330,17 @@
           }
         ],
         "tool_selection_strategy": "SELECTED"
+      },
+      "settings": {},
+      "position": {
+        "x": 529.3299179383387,
+        "y": -200.29785090463741
       }
     },
     {
       "id": "activity_d81d8af1_4b3f_4781_bff9_e6bfc8b58457",
-      "name": "Run Automation Fix",
       "type": "agentic",
-      "position": {
-        "x": 1278.6314229586035,
-        "y": -360.3125636836335
-      },
-      "settings": {},
+      "name": "Run Automation Fix",
       "parameters": {
         "prompt": "You are a network automation executor. You run an existing AAP Job Template for real (job_type \"run\") to remediate a Cisco IOS alert, using the Ansible MCP. You do not touch GitHub, you do not sync the project, and you do not create or edit anything except the job_type field of this one template.\n\n<log>\n${trigger}\n</log>\n\n# Tools\nUse only the Ansible MCP through \"discover\". Open only job_management and inventory_management, once each. Do not open any other toolset. Do not search jobs broadly or list unrelated objects. Call only tools whose exact names appeared in the discover output. Never guess a tool name.\n\n# Fixed values (refer to objects by these names)\n- Inventory: \"AWS Inventory\"\n- Template name: \"AWS Splunk: Fix aaa-6-user-privilege-update\"\n- Survey variables: host_name, rogue_user\n- Protected users (never remove): admin, ansible\n\n# Steps (stop at the first failure and report the exact error)\n0. If the log does not contain \"%AAA-6-USER_PRIVILEGE_UPDATE\", stop with \"unsupported event\".\n\n1. EXTRACT: From the log, get the device IP and rogue_user (pattern \"username: <name> privilege updated with priv-15\"). If rogue_user is one of the protected users, stop with \"manual review required\". Never invent values.\n\n2. FIND TEMPLATE: Look up the Job Template by its exact name \"AWS Splunk: Fix aaa-6-user-privilege-update\". If it does not exist, stop. Use the ID that the lookup returns only internally for the following calls, since the tools need it.\n\n3. CHECK-MODE GATE: Using the template ID from step 2, get the jobs of THAT template only (the template's own job list, newest first, one result). Do not search jobs by name.\n   - If there is no job, stop with \"no check-mode run found for this template\".\n   - If its job_type is not \"check\", stop with \"latest run is not a check run\".\n   - If its status is \"pending\", \"waiting\" or \"running\", check again at most 5 times.\n   - If its status is \"failed\" or \"error\", or it is still not finished after 5 checks, stop with the status.\n   - Continue only if its status is \"successful\".\n\n4. HOST LOOKUP: Find the inventory named \"AWS Inventory\" (search by name), then find the host in it whose private_ip_address equals the device IP, and use its inventory hostname as host_name. If none or several match, stop. Never use the IP or a guessed name.\n\n5. SET RUN MODE: Update the template so job_type is \"run\" (change only that field).\n\n6. LAUNCH: Launch the template ONCE with extra_vars {\"host_name\": \"<inventory hostname>\", \"rogue_user\": \"<username>\"}. Check the job status at most 5 times, until it is \"successful\", \"failed\" or \"error\". Report the last status you saw.\n\n7. RESTORE: Update the template so job_type is back to \"check\" (change only that field), whatever the job result was. Then stop.\n\n# Hard rules\n- Launch only this template, only once. Never launch any other template.\n- Never pass variables that are not in the survey.\n- Never remove a protected user.\n- Never make more than 20 tool calls in total. Do not retry a failed call more than once.\n- If a step fails before step 6, do not launch. If a step fails after step 5, still try step 7.\n\n# Output\nRespond ONLY with this valid JSON, no markdown or extra text:\n{\"result\":{\"content\":{\"success\":\"true or false as a string\",\"failed_step\":\"step name or empty string\",\"job_template\":\"name or empty string\",\"host_name\":\"inventory hostname or empty string\",\"rogue_user\":\"username or empty string\",\"job_id\":\"id or empty string\",\"job_status\":\"status or empty string\",\"message\":\"short result or exact error text\"}}}\nBoolean-like values must be the strings \"true\" or \"false\", never JSON booleans.",
         "llm_model_id": "7df9cb57-b161-4c33-ad5a-c28ba5e56c21",
@@ -392,33 +356,34 @@
           }
         ],
         "tool_selection_strategy": "SELECTED"
+      },
+      "settings": {},
+      "position": {
+        "x": 1278.6314229586035,
+        "y": -360.3125636836335
       }
     },
     {
       "id": "activity_ea127657_6706_45ab_a8bc_9f43b6207057",
-      "name": "Approve Fix Automation Execution",
       "type": "approval",
-      "position": {
-        "x": 960.2145915519593,
-        "y": -159.58181744576012
-      },
-      "settings": {},
+      "name": "Approve Fix Automation Execution",
       "parameters": {
         "prompt": "Approve Fix Automation Execution",
         "approver_users": [
           "admin"
         ],
         "fallback_decision": "reject"
+      },
+      "settings": {},
+      "position": {
+        "x": 959.0109006274324,
+        "y": -159.58181744576012
       }
     },
     {
       "id": "logic_1793115598126_hvz4it1ifm8k7",
-      "name": "Is there available any Job Template to fix the issue?",
       "type": "switch",
-      "position": {
-        "x": -593.2378713317985,
-        "y": -385.0081969035663
-      },
+      "name": "Is there available any Job Template to fix the issue?",
       "parameters": {
         "cases": [
           {
@@ -433,26 +398,61 @@
           }
         ],
         "default_port": "default"
-      }
-    }
-  ],
-  "triggers": [
-    {
-      "id": "activity_2f76a2b9_110c_444c_bab0_f8793eb7d364",
-      "name": "Trigger: Splunk Cisco",
-      "type": "eda_trigger",
-      "position": {
-        "x": -1729.008938962148,
-        "y": -306.2214604962934
       },
-      "parameters": {
-        "webhook_path": "cisco_splunk",
-        "authorized_service_account_ids": [
-          "bda0fa5e-9f67-4c53-a709-fd48d054e621"
-        ]
+      "position": {
+        "x": -593.2378713317985,
+        "y": -385.0081969035663
       }
     }
   ],
-  "description": "New workflow",
-  "schema_version": "2.0.0"
+  "edges": [
+    {
+      "from": "activity_ceeb9d64_4405_4c00_adc1_71c12865f7c4",
+      "to": "logic_1793115598126_hvz4it1ifm8k7"
+    },
+    {
+      "from": "activity_d68ed903_58da_4568_95ef_454bf7fae9e4",
+      "to": "activity_ea127657_6706_45ab_a8bc_9f43b6207057"
+    },
+    {
+      "from": "activity_ea127657_6706_45ab_a8bc_9f43b6207057",
+      "to": "activity_d81d8af1_4b3f_4781_bff9_e6bfc8b58457",
+      "from_port": "approved"
+    },
+    {
+      "from": "activity_16baf739_39fd_4822_9ccf_6bacb4f2b6c5",
+      "to": "activity_96169859_8105_40b1_8351_51c05de24b37"
+    },
+    {
+      "from": "activity_96169859_8105_40b1_8351_51c05de24b37",
+      "to": "activity_d68ed903_58da_4568_95ef_454bf7fae9e4"
+    },
+    {
+      "from": "activity_876f3816_d07e_449d_b125_0df707d9760a",
+      "to": "activity_ceeb9d64_4405_4c00_adc1_71c12865f7c4"
+    },
+    {
+      "from": "activity_2f76a2b9_110c_444c_bab0_f8793eb7d364",
+      "to": "activity_876f3816_d07e_449d_b125_0df707d9760a"
+    },
+    {
+      "from": "logic_1793115598126_hvz4it1ifm8k7",
+      "to": "activity_16baf739_39fd_4822_9ccf_6bacb4f2b6c5",
+      "from_port": "case_1"
+    },
+    {
+      "from": "logic_1793115598126_hvz4it1ifm8k7",
+      "to": "activity_7b92638d_5937_4a9a_9f3b_24d547cec6b6",
+      "from_port": "case_0"
+    },
+    {
+      "from": "activity_368a3fae_69ae_482e_8853_210a0516548a",
+      "to": "activity_6fb8f04b_be04_42b1_a754_efae5f3ddffd"
+    },
+    {
+      "from": "activity_ea127657_6706_45ab_a8bc_9f43b6207057",
+      "to": "activity_368a3fae_69ae_482e_8853_210a0516548a",
+      "from_port": "rejected"
+    }
+  ]
 }
