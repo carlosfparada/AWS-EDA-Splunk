@@ -306,7 +306,7 @@
           - logging source-interface GigabitEthernet 1
           - "logging host {{ groups['splunk'][0] }} transport udp port 1514"
           - logging trap informational
-          - login block-for 20 attempts 3 within 10
+          #- login block-for 20 attempts 3 within 10
         save_when: modified
 
     - name: Ensure GigabitEthernet 2 is enabled
